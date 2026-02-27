@@ -1,4 +1,7 @@
 package com.inndata20.tienda.repository;
 
-public interface ClienteRepository {
+import com.inndata20.tienda.entity.ClienteEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ClienteRepository extends JpaRepository<ClienteEntity,Integer> {
 }
