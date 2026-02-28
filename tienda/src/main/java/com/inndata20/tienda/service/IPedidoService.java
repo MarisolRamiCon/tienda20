@@ -8,5 +8,11 @@ import java.util.List;
 public interface IPedidoService {
     public List<PedidoEntity> readAll();
 
+    PedidoEntity buscarPorId(Integer id);
+
+    PedidoEntity guardarPersona(PedidoEntity pedido);
+
+    PedidoEntity actualizarPersona(Integer id, PedidoEntity pedido);
+
 
 }
