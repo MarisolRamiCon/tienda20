@@ -7,7 +7,7 @@ public interface IEmpleadoService {
 
     List<EmpleadoEntity> listarEmpleados();
     EmpleadoEntity buscarPorId(Integer id);
-    EmpleadoEntity guardarEmpleado(PersonaEntity empleado);
-    PersonaEntity actualizarEmpleado(Integer id, EmpleadoEntity);
+    EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado);
+    EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado);
 
 }
