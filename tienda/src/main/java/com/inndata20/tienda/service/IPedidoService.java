@@ -12,7 +12,5 @@ public interface IPedidoService {
 
     PedidoEntity guardarPersona(PedidoEntity pedido);
 
-    PedidoEntity actualizarPersona(Integer id, PedidoEntity pedido);
-
-
+    PedidoEntity actualizarPedido(Integer id, PedidoEntity pedido);
 }
