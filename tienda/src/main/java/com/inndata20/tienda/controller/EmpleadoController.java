@@ -1,3 +1,11 @@
+package com.inndata20.tienda.controller;
+
+import com.inndata20.tienda.entity.EmpleadoEntity;
+import com.inndata20.tienda.service.IEmpleadoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 @RestController
 @RequestMapping("/Empleados")
 public class EmpleadoController {
@@ -29,4 +37,4 @@ public class EmpleadoController {
         return empleadoService.actualizarEmpleado(id, empleado);
     }
 
-} // <-- esta llave va hasta el final
+}

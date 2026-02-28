@@ -21,14 +21,12 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Override
     public EmpleadoEntity buscarPorId(Integer id){
-       return empleadoRepository.findById(id).orElse(null);
+        return empleadoRepository.findById(id).orElse(null);
     }
 
     @Override
-    public EmpleadoEntity guardarEmpleado(PersonaEntity empleado){
-
+    public EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado){
         return empleadoRepository.save(empleado);
-
     }
 
     @Override
@@ -39,13 +37,9 @@ public class EmpleadoService implements IEmpleadoService {
             empleadoExistente.setDireccion(empleado.getDireccion());
             empleadoExistente.setEdad(empleado.getEdad());
             empleadoExistente.setId_departamento(empleado.getId_departamento());
-            return personaRepository.save(empleadoExistente);
+            return empleadoRepository.save(empleadoExistente);
         }
         return null;
     }
 
-
-
 }
-
-
