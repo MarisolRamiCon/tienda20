@@ -29,14 +29,16 @@ public class EmpleadoService implements IEmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+
     @Override
     public EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado) {
         EmpleadoEntity empleadoExistente = empleadoRepository.findById(id).orElse(null);
         if (empleadoExistente != null) {
             empleadoExistente.setNombre(empleado.getNombre());
-            empleadoExistente.setDireccion(empleado.getDireccion());
-            empleadoExistente.setEdad(empleado.getEdad());
-            empleadoExistente.setId_departamento(empleado.getId_departamento());
+            empleadoExistente.setApellido(empleado.getApellido());
+            empleadoExistente.setPuesto(empleado.getPuesto());
+            empleadoExistente.setSalario(empleado.getSalario());
+            empleadoExistente.setFecha_contratacion(empleado.getFecha_contratacion());
             return empleadoRepository.save(empleadoExistente);
         }
         return null;
