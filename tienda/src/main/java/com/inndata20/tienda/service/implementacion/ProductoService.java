@@ -17,6 +17,9 @@ public class ProductoService implements IProductoService {
     @Autowired
     ProductoRepository productoRepository;
 
+    @Autowired
+    ProveedoresRepository proveedoresRepository;
+
     @Override
     public List<ProductoDtoRequest> listarProductos() {
         return productoRepository.findAll()
@@ -60,8 +63,7 @@ public class ProductoService implements IProductoService {
     public ProductoDtoRequest buscarPorId(Integer id){
         return productoRepository.findById(id).orElse(null);
     }*/
-    @Autowired
-    ProveedoresRepository proveedoresRepository;
+
     @Override
     public ProductoEntity guardarProducto(ProductoDtoRequest dto) {
         ProductoEntity producto = new ProductoEntity();
@@ -79,8 +81,7 @@ public class ProductoService implements IProductoService {
     public ProductoEntity guardarProducto(ProductoEntity producto){
         return productoRepository.save(producto);
     }*/
-    @Autowired
-    ProveedoresRepository proveedoresRepository;
+
     @Override
     public ProductoEntity actualizarProducto(Integer id, ProductoDtoRequest dto) {
         ProductoEntity productoExistente = productoRepository.findById(id).orElse(null);
