@@ -47,9 +47,9 @@ public class PedidoController {
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarPedido(@PathVariable Integer id) {
         if (pedidoService.eliminarPedido(id)) {
-            return ResponseEntity.ok("Producto eliminado correctamente");
+            return ResponseEntity.ok("Pedido eliminado correctamente");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pedido no encontrado");
     }
 
 

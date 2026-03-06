@@ -42,11 +42,11 @@ public class EmpleadoController {
     // ELIMINA UN EMPLEADO
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarProducto(@PathVariable Integer id) {
+    public ResponseEntity<?> eliminarEmpleado(@PathVariable Integer id) {
         if (empleadoService.eliminarEmpleado(id)) {
-            return ResponseEntity.ok("Producto eliminado correctamente");
+            return ResponseEntity.ok("Empleado eliminado correctamente");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empleado no encontrado");
     }
 
 }
