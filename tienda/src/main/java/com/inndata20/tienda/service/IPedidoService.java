@@ -13,4 +13,6 @@ public interface IPedidoService {
     PedidoEntity guardarPedido(PedidoEntity pedido);
 
     PedidoEntity actualizarPedido(Integer id, PedidoEntity pedido);
+
+    boolean eliminarPedido(Integer id);
 }

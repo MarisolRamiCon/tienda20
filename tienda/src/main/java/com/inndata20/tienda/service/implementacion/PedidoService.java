@@ -42,4 +42,13 @@ public class PedidoService implements IPedidoService {
         return null;
     }
 
+    @Override
+    public boolean eliminarPedido(Integer id) {
+        if (pedidoRepository.existsById(id)) {
+            pedidoRepository.eliminarPedido(id);
+            return true;
+        }
+        return false;
+    }
+
 }
