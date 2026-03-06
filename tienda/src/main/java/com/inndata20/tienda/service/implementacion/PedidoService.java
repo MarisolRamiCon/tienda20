@@ -26,8 +26,8 @@ public class PedidoService implements IPedidoService {
     }
 
     @Override
-    public PedidoEntity guardarPersona(PedidoEntity persona) {
-        return pedidoRepository.save(persona);
+    public PedidoEntity guardarPedido(PedidoEntity pedido) {
+        return pedidoRepository.save(pedido);
     }
 
     @Override

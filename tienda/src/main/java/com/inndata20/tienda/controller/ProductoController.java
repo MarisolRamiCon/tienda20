@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/productos")
+@RequestMapping("/api/v1/")
 public class ProductoController {
     @Autowired
     ProductoService productoService;
@@ -28,7 +28,7 @@ public class ProductoController {
     // GUARDA UN PEDIDO
 
     @PostMapping("/guardar")
-    public ProductoEntity guardarPersona(@RequestBody ProductoEntity producto) {
+    public ProductoEntity guardarProducto(@RequestBody ProductoEntity producto) {
         return productoService.guardarProducto(producto);
     }
 

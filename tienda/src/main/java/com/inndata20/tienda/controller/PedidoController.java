@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pedidos")
+@RequestMapping("/api/v1/")
 public class PedidoController {
     @Autowired
     PedidoService pedidoService;
@@ -28,15 +28,15 @@ public class PedidoController {
     // GUARDA UN PEDIDO
 
     @PostMapping("/guardar")
-    public PedidoEntity guardarPersona(@RequestBody PedidoEntity persona) {
-        return pedidoService.guardarPersona(persona);
+    public PedidoEntity guardarPedido(@RequestBody PedidoEntity pedido) {
+        return pedidoService.guardarPedido(pedido);
     }
 
     // ACTUALIZA UN PEDIDO EXISTENTE
 
     @PutMapping("/actualizar/{id}")
-    public PedidoEntity actualizarPersona(@PathVariable Integer id, @RequestBody PedidoEntity persona) {
-        return pedidoService.actualizarPedido(id, persona);
+    public PedidoEntity actualizarPedido(@PathVariable Integer id, @RequestBody PedidoEntity pedido) {
+        return pedidoService.actualizarPedido(id, pedido);
     }
 
 

@@ -10,7 +10,7 @@ public interface IPedidoService {
 
     PedidoEntity buscarPorId(Integer id);
 
-    PedidoEntity guardarPersona(PedidoEntity pedido);
+    PedidoEntity guardarPedido(PedidoEntity pedido);
 
     PedidoEntity actualizarPedido(Integer id, PedidoEntity pedido);
 }
