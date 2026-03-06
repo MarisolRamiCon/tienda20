@@ -47,7 +47,7 @@ public class EmpleadoService implements IEmpleadoService {
     @Override
     public boolean eliminarEmpleado(Integer id) {
         if (empleadoRepository.existsById(id)) {
-            empleadoRepository.eliminarProducto(id);
+            empleadoRepository.eliminarEmpleado(id);
             return true;
         }
         return false;

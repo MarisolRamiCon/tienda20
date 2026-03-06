@@ -14,7 +14,7 @@ public interface EmpleadoRepository extends JpaRepository<EmpleadoEntity,Integer
     @Query("UPDATE EmpleadoEntity p SET p.activo = false WHERE p.id = :id")
     @Modifying
     @Transactional
-    void eliminarProducto(@Param("id") Integer id);
+    void eliminarEmpleado(@Param("id") Integer id);
 
 
 }
