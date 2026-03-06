@@ -1,6 +1,7 @@
 package com.inndata20.tienda.controller;
 
 import com.inndata20.tienda.entity.PedidoEntity;
+import com.inndata20.tienda.model.PedidoDtoRequest;
 import com.inndata20.tienda.service.implementacion.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,33 +17,24 @@ public class PedidoController {
     PedidoService pedidoService;
 
     @GetMapping("/listar")
-    public List<PedidoEntity> readAll(){
-        return pedidoService.readAll();
+    public List<PedidoDtoRequest> listarPedidos() {
+        return pedidoService.listarPedidos();
     }
 
-    // BUSCA POR ID
-
     @GetMapping("/buscar/{id}")
-    public PedidoEntity buscarPorId(@PathVariable Integer id) {
+    public PedidoDtoRequest buscarPorId(@PathVariable Integer id) {
         return pedidoService.buscarPorId(id);
     }
 
-    // GUARDA UN PEDIDO
-
     @PostMapping("/guardar")
-    public PedidoEntity guardarPedido(@RequestBody PedidoEntity pedido) {
-        return pedidoService.guardarPedido(pedido);
+    public PedidoEntity guardarPedido(@RequestBody PedidoDtoRequest dto) {
+        return pedidoService.guardarPedido(dto);
     }
-
-    // ACTUALIZA UN PEDIDO EXISTENTE
 
     @PutMapping("/actualizar/{id}")
-    public PedidoEntity actualizarPedido(@PathVariable Integer id, @RequestBody PedidoEntity pedido) {
-        return pedidoService.actualizarPedido(id, pedido);
+    public PedidoEntity actualizarPedido(@PathVariable Integer id, @RequestBody PedidoDtoRequest dto) {
+        return pedidoService.actualizarPedido(id, dto);
     }
-
-
-    // ELIMINAR UN PEDIDO EXISTENTE
 
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarPedido(@PathVariable Integer id) {
@@ -51,6 +43,5 @@ public class PedidoController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pedido no encontrado");
     }
-
 
 }

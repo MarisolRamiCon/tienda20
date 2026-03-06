@@ -1,18 +1,20 @@
 package com.inndata20.tienda.service;
 
 import com.inndata20.tienda.entity.PedidoEntity;
+import com.inndata20.tienda.model.PedidoDtoRequest;
 
 import java.util.List;
 
 
 public interface IPedidoService {
-    public List<PedidoEntity> readAll();
 
-    PedidoEntity buscarPorId(Integer id);
+    List<PedidoDtoRequest> listarPedidos();
 
-    PedidoEntity guardarPedido(PedidoEntity pedido);
+    PedidoDtoRequest buscarPorId(Integer id);
 
-    PedidoEntity actualizarPedido(Integer id, PedidoEntity pedido);
+    PedidoEntity guardarPedido(PedidoDtoRequest dto);
+
+    PedidoEntity actualizarPedido(Integer id, PedidoDtoRequest dto);
 
     boolean eliminarPedido(Integer id);
 }
