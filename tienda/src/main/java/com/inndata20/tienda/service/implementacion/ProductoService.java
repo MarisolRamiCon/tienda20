@@ -44,4 +44,15 @@ public class ProductoService implements IProductoService {
         return null;
     }
 
+    @Override
+    public boolean eliminarProducto(Integer id) {
+        if (productoRepository.existsById(id)) {
+            productoRepository.eliminarProducto(id);
+            return true;
+        }
+        return false;
+    }
+
+
+
 }

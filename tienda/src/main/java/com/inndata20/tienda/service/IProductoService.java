@@ -9,5 +9,7 @@ public interface IProductoService {
     ProductoEntity buscarPorId(Integer id);
     ProductoEntity guardarProducto(ProductoEntity producto);
     ProductoEntity actualizarProducto(Integer id, ProductoEntity producto);
+    boolean eliminarProducto(Integer id);
+
 
 }

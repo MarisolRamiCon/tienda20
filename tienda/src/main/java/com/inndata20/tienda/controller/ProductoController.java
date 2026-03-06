@@ -3,6 +3,8 @@ package com.inndata20.tienda.controller;
 import com.inndata20.tienda.entity.ProductoEntity;
 import com.inndata20.tienda.service.implementacion.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +39,19 @@ public class ProductoController {
     @PutMapping("/actualizar/{id}")
     public ProductoEntity actualizarProducto(@PathVariable Integer id, @RequestBody ProductoEntity producto) {
         return productoService.actualizarProducto(id, producto);
+
     }
+
+    // ELIMINAR UN PEDIDO EXISTENTE
+
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<?> eliminarProducto(@PathVariable Integer id) {
+        if (productoService.eliminarProducto(id)) {
+            return ResponseEntity.ok("Producto eliminado correctamente");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
+    }
+
 
 
 }
