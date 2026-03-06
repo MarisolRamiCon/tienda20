@@ -34,12 +34,12 @@ public class ProductoEntity {
     @Column(name = "categoria")
     private String categoria;
 
-    @Column(name = "proveedor")
-    private Integer proveedor;
-
     @Column(name = "stock")
     private Integer stock;
 
+    @ManyToOne
+    @JoinColumn(name = "proveedor")
+    private ProveedoresEntity proveedor;
 
 
 

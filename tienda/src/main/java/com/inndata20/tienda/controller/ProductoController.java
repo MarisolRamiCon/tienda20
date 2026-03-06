@@ -1,11 +1,13 @@
 package com.inndata20.tienda.controller;
 
 import com.inndata20.tienda.entity.ProductoEntity;
+import com.inndata20.tienda.model.ProductoDtoRequest;
 import com.inndata20.tienda.service.implementacion.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -16,29 +18,29 @@ public class ProductoController {
     ProductoService productoService;
 
     @GetMapping("/listar")
-    public List<ProductoEntity> listarProductos(){
+    public List<ProductoDtoRequest> listarProductos(){
         return productoService.listarProductos();
     }
 
     // BUSCA POR ID
 
     @GetMapping("/buscar/{id}")
-    public ProductoEntity buscarPorId(@PathVariable Integer id) {
+    public ProductoDtoRequest buscarPorId(@PathVariable Integer id) {
         return productoService.buscarPorId(id);
     }
 
     // GUARDA UN PEDIDO
 
     @PostMapping("/guardar")
-    public ProductoEntity guardarProducto(@RequestBody ProductoEntity producto) {
-        return productoService.guardarProducto(producto);
+    public ProductoEntity guardarProducto(@RequestBody ProductoDtoRequest dto) {
+        return productoService.guardarProducto(dto);
     }
 
     // ACTUALIZA UN PEDIDO EXISTENTE
 
     @PutMapping("/actualizar/{id}")
-    public ProductoEntity actualizarProducto(@PathVariable Integer id, @RequestBody ProductoEntity producto) {
-        return productoService.actualizarProducto(id, producto);
+    public ProductoEntity actualizarProducto(@PathVariable Integer id, @RequestBody ProductoDtoRequest dto) {
+        return productoService.actualizarProducto(id, dto);
 
     }
 
