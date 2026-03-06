@@ -9,5 +9,6 @@ public interface IEmpleadoService {
     EmpleadoEntity buscarPorId(Integer id);
     EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado);
     EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado);
+    boolean eliminarEmpleado(Integer id);
 
 }
