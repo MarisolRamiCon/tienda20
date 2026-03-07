@@ -5,24 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
-
 @Entity
-@Table(name = "pedidos")
+@Table(name = "inventario")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class PedidoEntity {
+public class InventarioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
-    @Column(name = "fecha_pedido")
-    private LocalDate fechaPedido;
-    @Column(name = "cliente_id")
-    private Integer clienteId;
-    @Column(name = "total")
-    private Double total;
+    private int id;
+    @OneToOne
+    @JoinColumn(name = "producto",unique = true)
+    private ProductoEntity producto;
+    @Column(name="cantidad_stock")
+    private int cantidad_stock;
 }

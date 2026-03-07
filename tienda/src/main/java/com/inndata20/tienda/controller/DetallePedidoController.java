@@ -1,30 +1,25 @@
 package com.inndata20.tienda.controller;
 
-import com.inndata20.tienda.entity.ClienteEntity;
+import com.inndata20.tienda.entity.DetallePedidoEntity;
 import com.inndata20.tienda.service.implementacion.ClienteService;
+import com.inndata20.tienda.service.implementacion.DetallePedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
 
-public class ClienteController {
+public class DetallePedidoController {
     @Autowired
-    ClienteService clienteService;
+    DetallePedidoService detallePedidoService;
 
-    @GetMapping("/clientes")
-    public List<ClienteEntity> readAll() {
-        return clienteService.readAll();
-    }
-
-    @GetMapping("/cliente/{id}")
-    public Optional<ClienteEntity> readById(@PathVariable int id) {
-        return clienteService.readById(id);
+    @GetMapping("/detallepedido/{id}")
+    public Optional<DetallePedidoEntity> readById(@PathVariable int id) {
+        return detallePedidoService.readById(id);
     }
 }
