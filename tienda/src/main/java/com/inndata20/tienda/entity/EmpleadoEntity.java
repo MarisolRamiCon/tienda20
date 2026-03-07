@@ -43,5 +43,8 @@ public class EmpleadoEntity {
     @Column(name = "fecha_contratacion")
     private LocalDate fecha_contratacion;
 
+    @Column(name = "activo")
+    private Boolean activo = true;
+
 }
 
