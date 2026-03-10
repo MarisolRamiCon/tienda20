@@ -2,6 +2,7 @@ package com.inndata20.tienda.controller;
 
 import com.inndata20.tienda.entity.ClienteEntity;
 import com.inndata20.tienda.model.ClienteDtoRequest;
+import com.inndata20.tienda.model.ClienteDtoResponse;
 import com.inndata20.tienda.service.implementacion.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,12 @@ public class ClienteController {
     ClienteService clienteService;
 
     @GetMapping("/clientes")
-    public List<ClienteEntity> readAll() {
+    public List<ClienteDtoResponse> readAll() {
         return clienteService.readAll();
     }
 
     @GetMapping("/cliente/{id}")
-    public Optional<ClienteEntity> readById(@PathVariable int id) {
+    public Optional<ClienteDtoResponse> readById(@PathVariable int id) {
         return clienteService.readById(id);
     }
 
