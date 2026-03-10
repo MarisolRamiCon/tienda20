@@ -57,16 +57,24 @@ public class PedidoService implements IPedidoService {
 
     @Override
     public String guardarPedido(PedidoDtoRequest dto) {
-        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
-        if (cliente == null) return "Cliente no encontrado";
 
-        PedidoEntity pedido = new PedidoEntity();
-        pedido.setFechaPedido(dto.getFechaPedido());
-        pedido.setTotal(dto.getTotal());
-        pedido.setActivo(true);
-        pedido.setCliente(cliente);
-        pedidoRepository.save(pedido);
-        return "Pedido creado exitosamente";
+        try {
+
+            ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+            if (cliente == null) return "Cliente no encontrado";
+
+            PedidoEntity pedido = new PedidoEntity();
+            pedido.setFechaPedido(dto.getFechaPedido());
+            pedido.setTotal(dto.getTotal());
+            pedido.setActivo(true);
+            pedido.setCliente(cliente);
+            pedidoRepository.save(pedido);
+            return "Pedido creado exitosamente";
+        } catch (DataAccessException e){
+            throw new PedidoServiceException("Error de acceso a la base de datos al guardar pedido", e);
+        } catch (Exception e) {
+            throw new PedidoServiceException("Error inesperado al guardar pedido", e);
+        }
     }
 
 
