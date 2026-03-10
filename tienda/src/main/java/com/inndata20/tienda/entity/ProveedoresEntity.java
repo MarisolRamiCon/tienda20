@@ -24,4 +24,6 @@ public class ProveedoresEntity {
     private String telefono;
     @Column (name = "correo")
     private String correo;
+    @Column(name = "activo",nullable = false)
+    private boolean activo = true;
 }

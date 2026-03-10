@@ -21,4 +21,6 @@ public class InventarioEntity {
     private ProductoEntity producto;
     @Column(name="cantidad_stock")
     private int cantidad_stock;
+    @Column(name = "activo",nullable = false)
+    private boolean activo = true;
 }

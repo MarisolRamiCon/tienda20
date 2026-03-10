@@ -16,11 +16,11 @@ public class InventarioService implements IInventarioService {
 
     @Override
     public List<InventarioEntity> readAll() {
-        return List.of();
+        return inventarioRepository.findAll();
     }
 
     @Override
     public InventarioEntity readById(int id) {
-        return null;
+        return inventarioRepository.findById(id).orElse(null);
     }
 }

@@ -27,4 +27,6 @@ public class DetallePedidoEntity {
     private int cantidad;
     @Column(name = "precio_unitario")
     private double precioUnitario;
+    @Column(name = "activo",nullable = false)
+    private boolean activo = true;
 }

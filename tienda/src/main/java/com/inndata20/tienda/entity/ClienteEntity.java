@@ -26,4 +26,6 @@ public class ClienteEntity {
     private String correo;
     @Column(name = "telefono")
     private String telefono;
+    @Column(name = "activo",nullable = false)
+    private boolean activo = true;
 }
