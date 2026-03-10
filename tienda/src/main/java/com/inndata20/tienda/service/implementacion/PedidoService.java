@@ -8,6 +8,7 @@ import com.inndata20.tienda.repository.ClienteRepository;
 import com.inndata20.tienda.repository.PedidoRepository;
 import com.inndata20.tienda.service.IPedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class PedidoService implements IPedidoService {
         this.clienteRepository = clienteRepository;
     }
 
-      @Override
+    @Override
     public List<PedidoDtoResponse> listarPedidos() {
         return pedidoRepository.findAll()
                 .stream()
@@ -68,27 +69,55 @@ public class PedidoService implements IPedidoService {
         return "Pedido creado exitosamente";
     }
 
+
     @Override
     public String actualizarPedido(Integer id, PedidoDtoRequest dto) {
-        PedidoEntity pedidoExistente = pedidoRepository.findById(id).orElse(null);
-        if (pedidoExistente == null) return "Pedido no encontrado";
+        try {
+            PedidoEntity pedidoExistente = pedidoRepository.findById(id).orElse(null);
+            if (pedidoExistente == null) return "Pedido no encontrado";
 
-        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
-        if (cliente == null) return "Cliente no encontrado";
+            ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+            if (cliente == null) return "Cliente no encontrado";
 
-        pedidoExistente.setFechaPedido(dto.getFechaPedido());
-        pedidoExistente.setTotal(dto.getTotal());
-        pedidoExistente.setCliente(cliente);
-        pedidoRepository.save(pedidoExistente);
-        return "Pedido actualizado exitosamente";
+            pedidoExistente.setFechaPedido(dto.getFechaPedido());
+            pedidoExistente.setTotal(dto.getTotal());
+            pedidoExistente.setCliente(cliente);
+
+            pedidoRepository.save(pedidoExistente);
+            return "Pedido actualizado exitosamente";
+
+        } catch (DataAccessException e) {
+            throw new PedidoServiceException("Error de acceso a la base de datos al actualizar pedido con id " + id, e);
+        } catch (Exception e) {
+            throw new PedidoServiceException("Error inesperado al actualizar pedido con id " + id, e);
+        }
+    }
+
+    public class PedidoServiceException extends RuntimeException {
+        public PedidoServiceException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 
     @Override
     public boolean eliminarPedido(Integer id) {
-        if (pedidoRepository.existsById(id)) {
-            pedidoRepository.eliminarPedido(id);
-            return true;
+
+        try {
+
+            if (pedidoRepository.existsById(id)) {
+                pedidoRepository.eliminarPedido(id);
+                return true;
+            }
+            return false;
+        } catch (DataAccessException e) {
+
+            throw new PedidoServiceException("Error de acceso a la base de datos", e);
+
+        } catch (Exception e) {
+
+            throw new PedidoServiceException("Error inesperado al eliminar pedido con id " + id, e);
+
+
         }
-        return false;
     }
 }

@@ -3,6 +3,7 @@ package com.inndata20.tienda.service.implementacion;
 import com.inndata20.tienda.entity.ClienteEntity;
 import com.inndata20.tienda.entity.PedidoEntity;
 import com.inndata20.tienda.model.PedidoDtoRequest;
+import com.inndata20.tienda.model.PedidoDtoResponse;
 import com.inndata20.tienda.repository.ClienteRepository;
 import com.inndata20.tienda.repository.PedidoRepository;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class PedidoServiceTest {
         when(pedidoRepository.findAll()).thenReturn(List.of());
 
         // Act
-        List<PedidoDtoRequest> resultado = pedidoService.listarPedidos();
+        List<PedidoDtoResponse> resultado = pedidoService.listarPedidos();
 
         // Assert
         assertNotNull(resultado);
@@ -51,7 +52,7 @@ class PedidoServiceTest {
         when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
 
         // Act
-        PedidoDtoRequest resultado = pedidoService.buscarPorId(1);
+        PedidoDtoResponse resultado = pedidoService.buscarPorId(1);
 
         // Assert
         assertNotNull(resultado);
@@ -75,11 +76,14 @@ class PedidoServiceTest {
         when(pedidoRepository.save(any(PedidoEntity.class))).thenReturn(pedido);
 
         // Act
-        PedidoEntity resultado = pedidoService.guardarPedido(dto);
+
+        String resultado = pedidoService.guardarPedido(dto);
+
 
         // Assert
         assertNotNull(resultado);
-        assertEquals(100.0, resultado.getTotal());
+        assertEquals("Pedido actualizado correctamente", resultado);
+
     }
 
     @Test
@@ -102,11 +106,11 @@ class PedidoServiceTest {
         when(pedidoRepository.save(pedidoExistente)).thenReturn(pedidoExistente);
 
         // Act
-        PedidoEntity resultado = pedidoService.actualizarPedido(1, dto);
+        String resultado = pedidoService.actualizarPedido(1, dto);
 
         // Assert
         assertNotNull(resultado);
-        assertEquals(200.0, resultado.getTotal());
+        assertEquals("Pedido actualizado correctamente", resultado);
     }
 
     @Test

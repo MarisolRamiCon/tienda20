@@ -3,6 +3,7 @@ package com.inndata20.tienda.service.implementacion;
 import com.inndata20.tienda.entity.ProductoEntity;
 import com.inndata20.tienda.entity.ProveedoresEntity;
 import com.inndata20.tienda.model.ProductoDtoRequest;
+import com.inndata20.tienda.model.ProductoDtoResponse;
 import com.inndata20.tienda.repository.ProductoRepository;
 import com.inndata20.tienda.repository.ProveedoresRepository;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class ProductoServiceTest {
         when(productoRepository.findAll()).thenReturn(List.of());
 
         // Act
-        List<ProductoDtoRequest> resultado = productoService.listarProductos();
+        List<ProductoDtoResponse> resultado = productoService.listarProductos();
 
         // Assert
         assertNotNull(resultado);
@@ -55,9 +56,9 @@ class ProductoServiceTest {
         when(productoRepository.findById(1)).thenReturn(Optional.of(producto));
 
         // Act
-        ProductoDtoRequest resultado = productoService.buscarPorId(1);
+        ProductoDtoResponse resultado = productoService.buscarPorId(1);
 
-        // Assert
+// Assert
         assertNotNull(resultado);
         assertEquals("Laptop HP", resultado.getNombre());
     }
@@ -80,11 +81,11 @@ class ProductoServiceTest {
         when(productoRepository.save(any(ProductoEntity.class))).thenReturn(producto);
 
         // Act
-        ProductoEntity resultado = productoService.guardarProducto(dto);
+        String resultado = productoService.guardarProducto(dto);
 
-        // Assert
+// Assert
         assertNotNull(resultado);
-        assertEquals("Laptop HP", resultado.getNombre());
+        assertEquals("Producto guardado correctamente", resultado);
     }
 
     @Test
@@ -107,11 +108,11 @@ class ProductoServiceTest {
         when(productoRepository.save(productoExistente)).thenReturn(productoExistente);
 
         // Act
-        ProductoEntity resultado = productoService.actualizarProducto(1, dto);
+        String resultado = productoService.actualizarProducto(1, dto);
 
-        // Assert
+// Assert
         assertNotNull(resultado);
-        assertEquals("Laptop Lenovo", resultado.getNombre());
+        assertEquals("Producto actualizado correctamente", resultado);
     }
 
     @Test
