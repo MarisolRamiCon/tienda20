@@ -1,4 +1,6 @@
-package com.inndata20.tienda.model;
+package com.inndata20.tienda.feign;
+
+// LOOMBOK
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,14 +11,13 @@ import lombok.NoArgsConstructor;
 @Data
 
 
-public class ProductoDtoRequest {
-
+public class APIMock {
+    private String productos; // El "id" que genera MockAPI
     private String nombre;
     private String descripcion;
-    private Double precio;
+    private String precio; // ✅ Viene como String no como Double
     private String categoria;
-    private Integer proveedor;
-    private Integer stock;
+    private Boolean stock;
 
 
 }

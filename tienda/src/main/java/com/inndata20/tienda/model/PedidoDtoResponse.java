@@ -9,13 +9,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
-public class PedidoDtoRequest {
+public class PedidoDtoResponse {
 
     private LocalDate fechaPedido;
     private Double total;
     private Integer clienteId;
-    private Boolean activo = true;
-
-
 }

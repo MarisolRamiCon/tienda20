@@ -41,4 +41,9 @@ public class ProductoEntity {
     @JoinColumn(name = "proveedor")
     private ProveedoresEntity proveedor;
 
+    @Column(name = "activo")
+    private Boolean activo = true;
+
+
+
 }

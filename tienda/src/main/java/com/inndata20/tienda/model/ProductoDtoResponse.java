@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
-
-public class ProductoDtoRequest {
+public class ProductoDtoResponse {
 
     private String nombre;
     private String descripcion;
@@ -17,6 +15,4 @@ public class ProductoDtoRequest {
     private String categoria;
     private Integer proveedor;
     private Integer stock;
-
-
 }

@@ -10,9 +10,13 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "pedidos")
-@Data
+
+// LOOMBOK
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
+
 
 public class PedidoEntity {
     @Id
@@ -21,8 +25,12 @@ public class PedidoEntity {
     private Integer id;
     @Column(name = "fecha_pedido")
     private LocalDate fechaPedido;
-    @Column(name = "cliente_id")
-    private Integer clienteId;
     @Column(name = "total")
     private Double total;
+    @Column(name = "activo")
+    private Boolean activo = true;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private ClienteEntity cliente;
+
 }
