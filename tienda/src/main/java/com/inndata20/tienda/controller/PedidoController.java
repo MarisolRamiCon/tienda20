@@ -14,8 +14,12 @@ import java.util.List;
 @RequestMapping("/api/v1/pedidos")
 public class PedidoController {
 
+    private final PedidoService pedidoService;
+
     @Autowired
-    PedidoService pedidoService;
+    public PedidoController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
+    }
 
     @GetMapping("/listar")
     public List<PedidoDtoResponse> listarPedidos() {
@@ -38,7 +42,7 @@ public class PedidoController {
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarPedido(@PathVariable Integer id) {
+    public ResponseEntity<String> eliminarPedido(@PathVariable Integer id) {
         if (pedidoService.eliminarPedido(id)) {
             return ResponseEntity.ok("Pedido eliminado correctamente");
         }

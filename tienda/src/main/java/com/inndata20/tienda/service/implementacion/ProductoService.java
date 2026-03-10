@@ -15,17 +15,23 @@ import java.util.List;
 @Service
 public class ProductoService implements IProductoService {
 
-    @Autowired
-    ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
+    private final ProveedoresRepository proveedoresRepository;
 
     @Autowired
-    ProveedoresRepository proveedoresRepository;
+    public ProductoService(ProductoRepository productoRepository,
+                           ProveedoresRepository proveedoresRepository) {
+        this.productoRepository = productoRepository;
+        this.proveedoresRepository = proveedoresRepository;
+    }
+
+
 
     @Override
     public List<ProductoDtoResponse> listarProductos() {
         return productoRepository.findAll()
                 .stream()
-                .filter(producto -> producto.getActivo()) // ✅ solo activos
+                .filter(ProductoEntity::getActivo) // ✅ solo activos
                 .map(producto -> {
                     ProductoDtoResponse dto = new ProductoDtoResponse();
                     dto.setNombre(producto.getNombre());
@@ -42,7 +48,7 @@ public class ProductoService implements IProductoService {
     @Override
     public ProductoDtoResponse buscarPorId(Integer id) {
         return productoRepository.findById(id)
-                .filter(producto -> producto.getActivo()) // ✅ solo si está activo
+                .filter(ProductoEntity::getActivo) // ✅ solo si está activo
                 .map(producto -> {
                     ProductoDtoResponse dto = new ProductoDtoResponse();
                     dto.setNombre(producto.getNombre());

@@ -14,8 +14,12 @@ import java.util.List;
 @RequestMapping("/api/v1/productos")
 public class ProductoController {
 
+    private final ProductoService productoService;
+
     @Autowired
-    ProductoService productoService;
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
 
     @GetMapping("/listar")
     public List<ProductoDtoResponse> listarProductos() {
@@ -38,7 +42,7 @@ public class ProductoController {
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarProducto(@PathVariable Integer id) {
+    public ResponseEntity<String> eliminarProducto(@PathVariable Integer id) {
         if (productoService.eliminarProducto(id)) {
             return ResponseEntity.ok("Producto eliminado correctamente");
         }

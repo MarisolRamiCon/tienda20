@@ -15,17 +15,21 @@ import java.util.List;
 @Service
 public class PedidoService implements IPedidoService {
 
-    @Autowired
-    PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ClienteRepository clienteRepository;
 
     @Autowired
-    ClienteRepository clienteRepository;
 
-    @Override
+    public PedidoService(PedidoRepository pedidoRepository, ClienteRepository clienteRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.clienteRepository = clienteRepository;
+    }
+
+      @Override
     public List<PedidoDtoResponse> listarPedidos() {
         return pedidoRepository.findAll()
                 .stream()
-                .filter(pedido -> pedido.getActivo())
+                .filter(PedidoEntity::getActivo)
                 .map(pedido -> {
                     PedidoDtoResponse dto = new PedidoDtoResponse();
                     dto.setFechaPedido(pedido.getFechaPedido());
@@ -39,7 +43,7 @@ public class PedidoService implements IPedidoService {
     @Override
     public PedidoDtoResponse buscarPorId(Integer id) {
         return pedidoRepository.findById(id)
-                .filter(pedido -> pedido.getActivo())
+                .filter(PedidoEntity::getActivo)
                 .map(pedido -> {
                     PedidoDtoResponse dto = new PedidoDtoResponse();
                     dto.setFechaPedido(pedido.getFechaPedido());

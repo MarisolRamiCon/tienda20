@@ -12,8 +12,12 @@ import java.util.List;
 @RequestMapping("/api/v1/empleados")
 public class EmpleadoController {
 
+    private final IEmpleadoService empleadoService;
+
     @Autowired
-    public IEmpleadoService empleadoService;
+    public EmpleadoController(IEmpleadoService empleadoService) {
+        this.empleadoService = empleadoService;
+    }
 
     // SELECCIONAR TODOS LOS EMPLEADOS
     @GetMapping("/listar")
@@ -42,7 +46,7 @@ public class EmpleadoController {
     // ELIMINA UN EMPLEADO
 
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarEmpleado(@PathVariable Integer id) {
+    public ResponseEntity<String> eliminarEmpleado(@PathVariable Integer id) {
         if (empleadoService.eliminarEmpleado(id)) {
             return ResponseEntity.ok("Empleado eliminado correctamente");
         }

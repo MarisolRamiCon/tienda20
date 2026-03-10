@@ -11,21 +11,25 @@ import java.util.List;
 @Service
 public class EmpleadoService implements IEmpleadoService {
 
+    private final EmpleadoRepository empleadoRepository;
+
     @Autowired
-    EmpleadoRepository empleadoRepository;
+    public EmpleadoService(EmpleadoRepository empleadoRepository) {
+        this.empleadoRepository = empleadoRepository;
+    }
 
     @Override
     public List<EmpleadoEntity> listarEmpleados() {
         return empleadoRepository.findAll()
                 .stream()
-                .filter(empleado -> empleado.getActivo()) // ✅ solo activos
+                .filter(EmpleadoEntity::getActivo) // ✅ solo activos
                 .toList();
     }
 
     @Override
     public EmpleadoEntity buscarPorId(Integer id) {
         return empleadoRepository.findById(id)
-                .filter(empleado -> empleado.getActivo()) // ✅ solo si está activo
+                .filter(EmpleadoEntity::getActivo) // ✅ solo si está activo
                 .orElse(null);
     }
 
@@ -44,7 +48,7 @@ public class EmpleadoService implements IEmpleadoService {
             empleadoExistente.setApellido(empleado.getApellido());
             empleadoExistente.setPuesto(empleado.getPuesto());
             empleadoExistente.setSalario(empleado.getSalario());
-            empleadoExistente.setFecha_contratacion(empleado.getFecha_contratacion());
+            empleadoExistente.setFechaContratacion(empleado.getFechaContratacion());
             return empleadoRepository.save(empleadoExistente);
         }
         return null;
