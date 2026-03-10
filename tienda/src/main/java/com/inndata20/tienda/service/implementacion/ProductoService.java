@@ -8,6 +8,7 @@ import com.inndata20.tienda.repository.ProveedoresRepository;
 import com.inndata20.tienda.service.IProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.inndata20.tienda.model.ProductoDtoResponse; // ✅ agrega esto
 
 import java.util.List;
 
@@ -21,11 +22,12 @@ public class ProductoService implements IProductoService {
     ProveedoresRepository proveedoresRepository;
 
     @Override
-    public List<ProductoDtoRequest> listarProductos() {
+    public List<ProductoDtoResponse> listarProductos() {
         return productoRepository.findAll()
                 .stream()
+                .filter(producto -> producto.getActivo()) // ✅ solo activos
                 .map(producto -> {
-                    ProductoDtoRequest dto = new ProductoDtoRequest();
+                    ProductoDtoResponse dto = new ProductoDtoResponse();
                     dto.setNombre(producto.getNombre());
                     dto.setDescripcion(producto.getDescripcion());
                     dto.setPrecio(producto.getPrecio());
@@ -37,16 +39,12 @@ public class ProductoService implements IProductoService {
                 .toList();
     }
 
-    /*@Override
-    public List<ProductoDtoRequest> listarProductos() {
-        return productoRepository.findAll();
-    }*/
-
     @Override
-    public ProductoDtoRequest buscarPorId(Integer id) {
+    public ProductoDtoResponse buscarPorId(Integer id) {
         return productoRepository.findById(id)
+                .filter(producto -> producto.getActivo()) // ✅ solo si está activo
                 .map(producto -> {
-                    ProductoDtoRequest dto = new ProductoDtoRequest();
+                    ProductoDtoResponse dto = new ProductoDtoResponse();
                     dto.setNombre(producto.getNombre());
                     dto.setDescripcion(producto.getDescripcion());
                     dto.setPrecio(producto.getPrecio());
@@ -58,60 +56,40 @@ public class ProductoService implements IProductoService {
                 .orElse(null);
     }
 
-
-    /*@Override
-    public ProductoDtoRequest buscarPorId(Integer id){
-        return productoRepository.findById(id).orElse(null);
-    }*/
-
     @Override
-    public ProductoEntity guardarProducto(ProductoDtoRequest dto) {
+    public String guardarProducto(ProductoDtoRequest dto) { // ✅ retorna String
+        ProveedoresEntity proveedor = proveedoresRepository.findById(dto.getProveedor()).orElse(null);
+        if (proveedor == null) return "Proveedor no encontrado";
+
         ProductoEntity producto = new ProductoEntity();
         producto.setNombre(dto.getNombre());
         producto.setDescripcion(dto.getDescripcion());
         producto.setPrecio(dto.getPrecio());
         producto.setCategoria(dto.getCategoria());
         producto.setStock(dto.getStock());
-        ProveedoresEntity proveedor = proveedoresRepository.findById(dto.getProveedor()).orElse(null);
+        producto.setActivo(true); // ✅ siempre inicia activo
         producto.setProveedor(proveedor);
-        return productoRepository.save(producto);
+        productoRepository.save(producto);
+        return "Producto creado exitosamente";
     }
-
-    /*@Override
-    public ProductoEntity guardarProducto(ProductoEntity producto){
-        return productoRepository.save(producto);
-    }*/
 
     @Override
-    public ProductoEntity actualizarProducto(Integer id, ProductoDtoRequest dto) {
+    public String actualizarProducto(Integer id, ProductoDtoRequest dto) { // ✅ retorna String
         ProductoEntity productoExistente = productoRepository.findById(id).orElse(null);
-        if (productoExistente != null) {
-            productoExistente.setNombre(dto.getNombre());
-            productoExistente.setDescripcion(dto.getDescripcion());
-            productoExistente.setPrecio(dto.getPrecio());
-            productoExistente.setCategoria(dto.getCategoria());
-            productoExistente.setStock(dto.getStock());
-            ProveedoresEntity proveedor = proveedoresRepository.findById(dto.getProveedor()).orElse(null);
-            productoExistente.setProveedor(proveedor);
-            return productoRepository.save(productoExistente);
-        }
-        return null;
-    }
+        if (productoExistente == null) return "Producto no encontrado";
 
-    /*@Override
-    public ProductoEntity actualizarProducto(Integer id, ProductoEntity producto) {
-        ProductoEntity productoExistente = productoRepository.findById(id).orElse(null);
-        if (productoExistente != null) {
-            productoExistente.setNombre(producto.getNombre());
-            productoExistente.setDescripcion(producto.getDescripcion());
-            productoExistente.setPrecio(producto.getPrecio());
-            productoExistente.setCategoria(producto.getCategoria());
-            productoExistente.setProveedor(producto.getProveedor());
-            productoExistente.setStock(producto.getStock());
-            return productoRepository.save(productoExistente);
-        }
-        return null;
-    }*/
+        ProveedoresEntity proveedor = proveedoresRepository.findById(dto.getProveedor()).orElse(null);
+        if (proveedor == null) return "Proveedor no encontrado";
+
+        productoExistente.setNombre(dto.getNombre());
+        productoExistente.setDescripcion(dto.getDescripcion());
+        productoExistente.setPrecio(dto.getPrecio());
+        productoExistente.setCategoria(dto.getCategoria());
+        productoExistente.setStock(dto.getStock());
+        productoExistente.setProveedor(proveedor);
+        productoRepository.save(productoExistente);
+        return "Producto actualizado exitosamente";
+    }
 
     @Override
     public boolean eliminarProducto(Integer id) {
@@ -121,18 +99,4 @@ public class ProductoService implements IProductoService {
         }
         return false;
     }
-
-
-
-    /*@Override
-    public boolean eliminarProducto(Integer id) {
-        if (productoRepository.existsById(id)) {
-            productoRepository.eliminarProducto(id);
-            return true;
-        }
-        return false;
-    }*/
-
-
-
 }

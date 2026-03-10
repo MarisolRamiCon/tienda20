@@ -1,7 +1,7 @@
 package com.inndata20.tienda.controller;
 
-import com.inndata20.tienda.entity.PedidoEntity;
 import com.inndata20.tienda.model.PedidoDtoRequest;
+import com.inndata20.tienda.model.PedidoDtoResponse;
 import com.inndata20.tienda.service.implementacion.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,26 +13,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/pedidos")
 public class PedidoController {
+
     @Autowired
     PedidoService pedidoService;
 
     @GetMapping("/listar")
-    public List<PedidoDtoRequest> listarPedidos() {
+    public List<PedidoDtoResponse> listarPedidos() {
         return pedidoService.listarPedidos();
     }
 
     @GetMapping("/buscar/{id}")
-    public PedidoDtoRequest buscarPorId(@PathVariable Integer id) {
+    public PedidoDtoResponse buscarPorId(@PathVariable Integer id) {
         return pedidoService.buscarPorId(id);
     }
 
     @PostMapping("/guardar")
-    public PedidoEntity guardarPedido(@RequestBody PedidoDtoRequest dto) {
+    public String guardarPedido(@RequestBody PedidoDtoRequest dto) {
         return pedidoService.guardarPedido(dto);
     }
 
     @PutMapping("/actualizar/{id}")
-    public PedidoEntity actualizarPedido(@PathVariable Integer id, @RequestBody PedidoDtoRequest dto) {
+    public String actualizarPedido(@PathVariable Integer id, @RequestBody PedidoDtoRequest dto) {
         return pedidoService.actualizarPedido(id, dto);
     }
 
@@ -43,5 +44,4 @@ public class PedidoController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pedido no encontrado");
     }
-
 }

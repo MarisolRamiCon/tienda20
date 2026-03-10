@@ -2,10 +2,8 @@ package com.inndata20.tienda.service.implementacion;
 
 import com.inndata20.tienda.entity.ClienteEntity;
 import com.inndata20.tienda.entity.PedidoEntity;
-import com.inndata20.tienda.entity.ProductoEntity;
-import com.inndata20.tienda.entity.ProveedoresEntity;
 import com.inndata20.tienda.model.PedidoDtoRequest;
-import com.inndata20.tienda.model.ProductoDtoRequest;
+import com.inndata20.tienda.model.PedidoDtoResponse;
 import com.inndata20.tienda.repository.ClienteRepository;
 import com.inndata20.tienda.repository.PedidoRepository;
 import com.inndata20.tienda.service.IPedidoService;
@@ -15,8 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-
 public class PedidoService implements IPedidoService {
+
     @Autowired
     PedidoRepository pedidoRepository;
 
@@ -24,29 +22,28 @@ public class PedidoService implements IPedidoService {
     ClienteRepository clienteRepository;
 
     @Override
-    public List<PedidoDtoRequest> listarPedidos() {
+    public List<PedidoDtoResponse> listarPedidos() {
         return pedidoRepository.findAll()
                 .stream()
+                .filter(pedido -> pedido.getActivo())
                 .map(pedido -> {
-                    PedidoDtoRequest dto = new PedidoDtoRequest();
+                    PedidoDtoResponse dto = new PedidoDtoResponse();
                     dto.setFechaPedido(pedido.getFechaPedido());
                     dto.setTotal(pedido.getTotal());
-                    dto.setActivo(pedido.getActivo());
                     dto.setClienteId(pedido.getCliente().getId());
                     return dto;
                 })
                 .toList();
     }
 
-
     @Override
-    public PedidoDtoRequest buscarPorId(Integer id) {
+    public PedidoDtoResponse buscarPorId(Integer id) {
         return pedidoRepository.findById(id)
+                .filter(pedido -> pedido.getActivo())
                 .map(pedido -> {
-                    PedidoDtoRequest dto = new PedidoDtoRequest();
+                    PedidoDtoResponse dto = new PedidoDtoResponse();
                     dto.setFechaPedido(pedido.getFechaPedido());
                     dto.setTotal(pedido.getTotal());
-                    dto.setActivo(pedido.getActivo());
                     dto.setClienteId(pedido.getCliente().getId());
                     return dto;
                 })
@@ -54,28 +51,32 @@ public class PedidoService implements IPedidoService {
     }
 
     @Override
-    public PedidoEntity guardarPedido(PedidoDtoRequest dto) {
+    public String guardarPedido(PedidoDtoRequest dto) {
+        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+        if (cliente == null) return "Cliente no encontrado";
+
         PedidoEntity pedido = new PedidoEntity();
         pedido.setFechaPedido(dto.getFechaPedido());
         pedido.setTotal(dto.getTotal());
-        pedido.setActivo(dto.getActivo());
-        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+        pedido.setActivo(true);
         pedido.setCliente(cliente);
-        return pedidoRepository.save(pedido);
+        pedidoRepository.save(pedido);
+        return "Pedido creado exitosamente";
     }
 
     @Override
-    public PedidoEntity actualizarPedido(Integer id, PedidoDtoRequest dto) {
+    public String actualizarPedido(Integer id, PedidoDtoRequest dto) {
         PedidoEntity pedidoExistente = pedidoRepository.findById(id).orElse(null);
-        if (pedidoExistente != null) {
-            pedidoExistente.setFechaPedido(dto.getFechaPedido());
-            pedidoExistente.setTotal(dto.getTotal());
-            pedidoExistente.setActivo(dto.getActivo());
-            ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
-            pedidoExistente.setCliente(cliente);
-            return pedidoRepository.save(pedidoExistente);
-        }
-        return null;
+        if (pedidoExistente == null) return "Pedido no encontrado";
+
+        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+        if (cliente == null) return "Cliente no encontrado";
+
+        pedidoExistente.setFechaPedido(dto.getFechaPedido());
+        pedidoExistente.setTotal(dto.getTotal());
+        pedidoExistente.setCliente(cliente);
+        pedidoRepository.save(pedidoExistente);
+        return "Pedido actualizado exitosamente";
     }
 
     @Override
@@ -86,10 +87,4 @@ public class PedidoService implements IPedidoService {
         }
         return false;
     }
-
-
 }
-
-
-
-

@@ -16,13 +16,19 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Override
     public List<EmpleadoEntity> listarEmpleados() {
-        return empleadoRepository.findAll();
+        return empleadoRepository.findAll()
+                .stream()
+                .filter(empleado -> empleado.getActivo()) // ✅ solo activos
+                .toList();
     }
 
     @Override
-    public EmpleadoEntity buscarPorId(Integer id){
-        return empleadoRepository.findById(id).orElse(null);
+    public EmpleadoEntity buscarPorId(Integer id) {
+        return empleadoRepository.findById(id)
+                .filter(empleado -> empleado.getActivo()) // ✅ solo si está activo
+                .orElse(null);
     }
+
 
     @Override
     public EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado){
