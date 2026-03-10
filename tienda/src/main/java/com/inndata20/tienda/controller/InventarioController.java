@@ -2,7 +2,6 @@ package com.inndata20.tienda.controller;
 
 import com.inndata20.tienda.entity.InventarioEntity;
 import com.inndata20.tienda.service.implementacion.InventarioService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +13,12 @@ import java.util.List;
 @RequestMapping("/api/v1/")
 
 public class InventarioController {
-    @Autowired
-    InventarioService inventarioService;
+
+    private final InventarioService inventarioService;
+
+    public InventarioController(InventarioService inventarioService) {
+        this.inventarioService = inventarioService;
+    }
 
     @GetMapping("/inventarios")
     public List<InventarioEntity> readAll()
