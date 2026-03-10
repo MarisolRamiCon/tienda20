@@ -6,5 +6,9 @@ import java.util.List;
 public interface IEmpleadoService {
 
     List<EmpleadoEntity> listarEmpleados();
+    EmpleadoEntity buscarPorId(Integer id);
+    EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado);
+    EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado);
+    boolean eliminarEmpleado(Integer id);
 
 }

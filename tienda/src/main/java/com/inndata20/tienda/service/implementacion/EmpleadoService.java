@@ -16,8 +16,47 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Override
     public List<EmpleadoEntity> listarEmpleados() {
-        return empleadoRepository.findAll();
+        return empleadoRepository.findAll()
+                .stream()
+                .filter(empleado -> empleado.getActivo()) // ✅ solo activos
+                .toList();
     }
+
+    @Override
+    public EmpleadoEntity buscarPorId(Integer id) {
+        return empleadoRepository.findById(id)
+                .filter(empleado -> empleado.getActivo()) // ✅ solo si está activo
+                .orElse(null);
+    }
+
+
+    @Override
+    public EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado){
+        return empleadoRepository.save(empleado);
+    }
+
+
+    @Override
+    public EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado) {
+        EmpleadoEntity empleadoExistente = empleadoRepository.findById(id).orElse(null);
+        if (empleadoExistente != null) {
+            empleadoExistente.setNombre(empleado.getNombre());
+            empleadoExistente.setApellido(empleado.getApellido());
+            empleadoExistente.setPuesto(empleado.getPuesto());
+            empleadoExistente.setSalario(empleado.getSalario());
+            empleadoExistente.setFecha_contratacion(empleado.getFecha_contratacion());
+            return empleadoRepository.save(empleadoExistente);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean eliminarEmpleado(Integer id) {
+        if (empleadoRepository.existsById(id)) {
+            empleadoRepository.eliminarEmpleado(id);
+            return true;
+        }
+        return false;
+    }
+
 }
-
-

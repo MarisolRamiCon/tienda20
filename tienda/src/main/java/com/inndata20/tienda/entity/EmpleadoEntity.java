@@ -6,11 +6,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "empleados")
+
+// LOOMBOK
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+
 public class EmpleadoEntity {
 
     @Id
@@ -32,55 +43,8 @@ public class EmpleadoEntity {
     @Column(name = "fecha_contratacion")
     private LocalDate fecha_contratacion;
 
-    public EmpleadoEntity() {
-    }
+    @Column(name = "activo")
+    private Boolean activo = true;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public String getPuesto() {
-        return puesto;
-    }
-
-    public void setPuesto(String puesto) {
-        this.puesto = puesto;
-    }
-
-    public BigDecimal getSalario() {
-        return salario;
-    }
-
-    public void setSalario(BigDecimal salario) {
-        this.salario = salario;
-    }
-
-    public LocalDate getFecha_contratacion() {
-        return fecha_contratacion;
-    }
-
-    public void setFecha_contratacion(LocalDate fecha_contratacion) {
-        this.fecha_contratacion = fecha_contratacion;
-    }
 }
 
