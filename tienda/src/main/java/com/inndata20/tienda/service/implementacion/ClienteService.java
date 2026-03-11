@@ -58,7 +58,16 @@ public class ClienteService implements IClienteService {
         nuevoCliente.setDireccion(cliente.getDireccion());
         nuevoCliente.setCorreo(cliente.getCorreo());
         nuevoCliente.setTelefono(cliente.getTelefono());
-        clienteRepository.save(nuevoCliente);
-        return "Cliente Registrado exitosamente";
+
+        if (nuevoCliente.getCorreo() != null || nuevoCliente.getTelefono() != null){
+            try {
+                clienteRepository.save(nuevoCliente);
+                return "Cliente registrado exitosamente";
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+        } else  {
+            return "El cliente debe registrar un correo y/o un numero de telefono";
+        }
     }
 }

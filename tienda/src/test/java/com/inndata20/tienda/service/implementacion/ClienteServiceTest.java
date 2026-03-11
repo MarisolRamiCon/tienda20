@@ -62,7 +62,9 @@ class ClienteServiceTest {
         clienteNuevo.setApellido("Sigma");
         clienteNuevo.setDireccion("Porai");
         clienteNuevo.setTelefono("1234567890");
+        ClienteDtoRequest clienteErroneo = new ClienteDtoRequest();
         String salida = clienteService.create(clienteNuevo);
-        assertEquals("Cliente Registrado exitosamente",salida);
+        assertEquals("Cliente registrado exitosamente",salida);
+
     }
 }

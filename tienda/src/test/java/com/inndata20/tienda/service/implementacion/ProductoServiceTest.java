@@ -1,4 +1,3 @@
-/*
 package com.inndata20.tienda.service.implementacion;
 
 
@@ -127,4 +126,3 @@ class ProductoServiceTest {
         assertFalse(productoService.eliminarProducto(99));
     }
 }
- */
