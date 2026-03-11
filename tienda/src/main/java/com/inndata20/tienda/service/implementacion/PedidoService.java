@@ -10,6 +10,7 @@ import com.inndata20.tienda.service.IPedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class PedidoService implements IPedidoService {
                 })
                 .orElse(null);
     }
-
+    @Transactional
     @Override
     public String guardarPedido(PedidoDtoRequest dto) {
 
@@ -77,7 +78,7 @@ public class PedidoService implements IPedidoService {
         }
     }
 
-
+    @Transactional
     @Override
     public String actualizarPedido(Integer id, PedidoDtoRequest dto) {
         try {
@@ -106,7 +107,7 @@ public class PedidoService implements IPedidoService {
             super(message, cause);
         }
     }
-
+    @Transactional
     @Override
     public boolean eliminarPedido(Integer id) {
 

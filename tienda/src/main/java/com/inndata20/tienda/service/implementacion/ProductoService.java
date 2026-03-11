@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import com.inndata20.tienda.model.ProductoDtoResponse; // ✅ agrega esto
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class ProductoService implements IProductoService {
                 })
                 .orElse(null);
     }
-
+    @Transactional
     @Override
     public String guardarProducto(ProductoDtoRequest dto) { // ✅ retorna String
 
@@ -90,7 +91,7 @@ public class ProductoService implements IProductoService {
 
         }
     }
-
+    @Transactional
     @Override
     public String actualizarProducto(Integer id, ProductoDtoRequest dto) { // ✅ retorna String
 
@@ -130,7 +131,7 @@ public class ProductoService implements IProductoService {
             super(message, cause);
         }
     }
-
+    @Transactional
     @Override
     public boolean eliminarProducto(Integer id) {
 
@@ -151,4 +152,43 @@ public class ProductoService implements IProductoService {
 
         }
     }
+
+    // Filtrar por categoría y precio menor a X
+    @Override
+    public List<ProductoDtoResponse> buscarPorCategoriaYPrecio(String categoria, Double precio) {
+        return productoRepository.findByCategoriaAndPrecioLessThan(categoria, precio)
+                .stream()
+                .filter(ProductoEntity::getActivo)
+                .map(producto -> {
+                    ProductoDtoResponse dto = new ProductoDtoResponse();
+                    dto.setNombre(producto.getNombre());
+                    dto.setDescripcion(producto.getDescripcion());
+                    dto.setPrecio(producto.getPrecio());
+                    dto.setCategoria(producto.getCategoria());
+                    dto.setProveedor(producto.getProveedor().getId());
+                    dto.setStock(producto.getStock());
+                    return dto;
+                })
+                .toList();
+    }
+
+    // Filtrar por stock entre X y Y
+    @Override
+    public List<ProductoDtoResponse> buscarPorStockEntre(Integer stockMin, Integer stockMax) {
+        return productoRepository.findByStockBetween(stockMin, stockMax)
+                .stream()
+                .filter(ProductoEntity::getActivo)
+                .map(producto -> {
+                    ProductoDtoResponse dto = new ProductoDtoResponse();
+                    dto.setNombre(producto.getNombre());
+                    dto.setDescripcion(producto.getDescripcion());
+                    dto.setPrecio(producto.getPrecio());
+                    dto.setCategoria(producto.getCategoria());
+                    dto.setProveedor(producto.getProveedor().getId());
+                    dto.setStock(producto.getStock());
+                    return dto;
+                })
+                .toList();
+    }
+
 }

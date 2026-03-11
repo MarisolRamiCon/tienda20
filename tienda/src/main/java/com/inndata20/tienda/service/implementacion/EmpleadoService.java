@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class EmpleadoService implements IEmpleadoService {
             super(message, cause);
         }
     }
-
+    @Transactional
     @Override
     public EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado) {
         try {
@@ -54,7 +55,7 @@ public class EmpleadoService implements IEmpleadoService {
     }
 
 
-
+    @Transactional
     @Override
     public EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado) {
 
@@ -82,7 +83,7 @@ public class EmpleadoService implements IEmpleadoService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(EmpleadoService.class);
-
+    @Transactional
     @Override
     public boolean eliminarEmpleado(Integer id) {
         try {

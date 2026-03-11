@@ -22,4 +22,29 @@ public class MockService implements ImockService {
     public List<APIMock> listarProductos() {
         return mockClient.listarProductos();
     }
+
+    // 🆕 Buscar por ID
+    @Override
+    public APIMock obtenerProducto(String id) {
+        return mockClient.obtenerProducto(id);
+    }
+
+    // 🆕 Crear
+    @Override
+    public APIMock crearProducto(APIMock producto) {
+        return mockClient.crearProducto(producto);
+    }
+
+    // 🆕 Actualizar
+    @Override
+    public APIMock actualizarProducto(String id, APIMock producto) {
+        return mockClient.actualizarProducto(id, producto);
+    }
+
+    // 🆕 Eliminar
+    @Override
+    public void eliminarProducto(String id) {
+        mockClient.eliminarProducto(id);
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.inndata20.tienda.controller;
 
+import com.inndata20.tienda.entity.ProductoEntity;
 import com.inndata20.tienda.model.ProductoDtoRequest;
+import com.inndata20.tienda.repository.ProductoRepository;
 import com.inndata20.tienda.service.implementacion.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,4 +50,21 @@ public class ProductoController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
     }
+
+    // Filtrar por categoría y precio menor a X
+    @GetMapping("/buscar/categoria")
+    public ResponseEntity<List<ProductoDtoResponse>> buscarPorCategoriaYPrecio(
+            @RequestParam String categoria,
+            @RequestParam Double precio) {
+        return ResponseEntity.ok(productoService.buscarPorCategoriaYPrecio(categoria, precio));
+    }
+
+    // Filtrar por stock entre X y Y
+    @GetMapping("/buscar/stock")
+    public ResponseEntity<List<ProductoDtoResponse>> buscarPorStockEntre(
+            @RequestParam Integer stockMin,
+            @RequestParam Integer stockMax) {
+        return ResponseEntity.ok(productoService.buscarPorStockEntre(stockMin, stockMax));
+    }
+
 }

@@ -12,4 +12,12 @@ public interface IProductoService {
     String guardarProducto(ProductoDtoRequest dto);
     String actualizarProducto(Integer id, ProductoDtoRequest dto);
     boolean eliminarProducto(Integer id);
+
+    //  Filtrar por categoría y precio menor a X
+    List<ProductoDtoResponse> buscarPorCategoriaYPrecio(String categoria, Double precio);
+
+    // Filtrar por stock entre X y Y
+    List<ProductoDtoResponse> buscarPorStockEntre(Integer stockMin, Integer stockMax);
+
+
 }

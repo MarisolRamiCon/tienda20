@@ -1,6 +1,6 @@
 package com.inndata20.tienda.feign;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -9,5 +9,17 @@ public interface MockClient {
 
     @GetMapping("/productos")
     List<APIMock> listarProductos();
+
+    @GetMapping("/productos/{id}")
+    APIMock obtenerProducto(@PathVariable("id") String id);
+
+    @PostMapping("/productos")
+    APIMock crearProducto(@RequestBody APIMock producto);
+
+    @PutMapping("/productos/{id}")
+    APIMock actualizarProducto(@PathVariable("id") String id, @RequestBody APIMock producto);
+
+    @DeleteMapping("/productos/{id}")
+    void eliminarProducto(@PathVariable("id") String id);
 
 }
