@@ -33,4 +33,19 @@ public class ClienteController {
     public String create(@RequestBody ClienteDtoRequest clienteDtoRequest) {
         return clienteService.create(clienteDtoRequest);
     }
+
+    @PatchMapping("/cliente/{id}")
+    public String update(@PathVariable int id, @RequestBody ClienteDtoRequest clienteDtoRequest) {
+        return clienteService.updateById(id, clienteDtoRequest);
+    }
+
+    @GetMapping("/buscarcliente")
+    public List<ClienteDtoResponse> searchByNombre(@RequestParam String busqueda) {
+        return clienteService.searchByName(busqueda);
+    }
+
+    @PutMapping("/cliente/{id}")
+    public String delete(@PathVariable int id) {
+        return clienteService.deleteById(id);
+    }
 }

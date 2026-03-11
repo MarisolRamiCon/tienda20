@@ -11,4 +11,8 @@ public interface IClienteService {
     Optional<ClienteDtoResponse> readById(int id);
 
     String create(ClienteDtoRequest cliente);
+
+    String updateById(int id, ClienteDtoRequest entrada);
+
+    String deleteById(int id);
 }
