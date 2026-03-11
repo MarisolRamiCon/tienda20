@@ -6,26 +6,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "clientes")
+@Table(name = "inventario")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ClienteEntity {
+public class InventarioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name = "nombre")
-    private String nombre;
-    @Column(name = "apellido")
-    private String apellido;
-    @Column(name = "direccion")
-    private String direccion;
-    @Column(name = "correo")
-    private String correo;
-    @Column(name = "telefono")
-    private String telefono;
+    @OneToOne
+    @JoinColumn(name = "producto",unique = true)
+    private ProductoEntity producto;
+    @Column(name="cantidad_stock")
+    private int cantidadStock;
     @Column(name = "activo",nullable = false)
     private boolean activo = true;
 }
