@@ -1,21 +1,23 @@
 package com.inndata20.tienda.controller;
 
-import com.inndata20.tienda.entity.ClienteEntity;
 import com.inndata20.tienda.model.ClienteDtoRequest;
 import com.inndata20.tienda.model.ClienteDtoResponse;
 import com.inndata20.tienda.service.implementacion.ClienteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/clientes")
+@RequestMapping("/api/v1")
 
 public class ClienteController {
-    @Autowired
-    ClienteService clienteService;
+
+    private final ClienteService clienteService;
+
+    public ClienteController(ClienteService clienteService) {
+        this.clienteService = clienteService;
+    }
 
     @GetMapping("/clientes")
     public List<ClienteDtoResponse> readAll() {

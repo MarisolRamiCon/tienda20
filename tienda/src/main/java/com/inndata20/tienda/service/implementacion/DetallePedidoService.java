@@ -14,8 +14,11 @@ import java.util.Optional;
 
 public class DetallePedidoService implements IDetallePedidoService {
 
-    @Autowired
-    DetallePedidoRepository detallePedidoRepository;
+    private final DetallePedidoRepository detallePedidoRepository;
+
+    public DetallePedidoService(DetallePedidoRepository detallePedidoRepository) {
+        this.detallePedidoRepository = detallePedidoRepository;
+    }
 
     @Override
     public List<DetallePedidoEntity> readAllByClienteId(int id) {

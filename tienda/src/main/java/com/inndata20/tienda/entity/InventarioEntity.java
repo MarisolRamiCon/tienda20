@@ -20,7 +20,7 @@ public class InventarioEntity {
     @JoinColumn(name = "producto",unique = true)
     private ProductoEntity producto;
     @Column(name="cantidad_stock")
-    private int cantidad_stock;
+    private int cantidadStock;
     @Column(name = "activo",nullable = false)
     private boolean activo = true;
 }
