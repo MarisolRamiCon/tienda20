@@ -12,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -129,4 +130,42 @@ public class PedidoService implements IPedidoService {
 
         }
     }
+
+    @Override
+    public List<PedidoDtoResponse> buscarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+
+        return pedidoRepository.findByFechaPedidoBetween(fechaInicio, fechaFin)
+                .stream()
+
+                .filter(PedidoEntity::getActivo)
+
+                .map(pedido -> {
+                    PedidoDtoResponse dto = new PedidoDtoResponse();
+                    dto.setFechaPedido(pedido.getFechaPedido());
+                    dto.setTotal(pedido.getTotal());
+                    dto.setClienteId(pedido.getCliente().getId());
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    public List<PedidoDtoResponse> buscarPorCliente(Integer clienteId) {
+
+        return pedidoRepository.findByCliente_Id(clienteId)
+                .stream()
+
+                .filter(PedidoEntity::getActivo)
+
+                .map(pedido -> {
+                    PedidoDtoResponse dto = new PedidoDtoResponse();
+                    dto.setFechaPedido(pedido.getFechaPedido());
+                    dto.setTotal(pedido.getTotal());
+                    dto.setClienteId(pedido.getCliente().getId());
+                    return dto;
+                })
+                .toList();
+    }
+
+
 }

@@ -1,10 +1,10 @@
 package com.inndata20.tienda.service.implementacion;
 
 import com.inndata20.tienda.entity.EmpleadoEntity;
+import com.inndata20.tienda.model.EmpleadoDtoRequest;
+import com.inndata20.tienda.model.EmpleadoDtoResponse;
 import com.inndata20.tienda.repository.EmpleadoRepository;
 import com.inndata20.tienda.service.IEmpleadoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -23,66 +23,63 @@ public class EmpleadoService implements IEmpleadoService {
     }
 
     @Override
-    public List<EmpleadoEntity> listarEmpleados() {
+    public List<EmpleadoDtoResponse> listarEmpleados() {
         return empleadoRepository.findAll()
                 .stream()
-                .filter(EmpleadoEntity::getActivo) // ✅ solo activos
+                .filter(EmpleadoEntity::getActivo)
+                .map(this::mapearADto) // Usamos el método auxiliar
                 .toList();
     }
 
     @Override
-    public EmpleadoEntity buscarPorId(Integer id) {
+    public EmpleadoDtoResponse buscarPorId(Integer id) {
         return empleadoRepository.findById(id)
-                .filter(EmpleadoEntity::getActivo) // ✅ solo si está activo
+                .filter(EmpleadoEntity::getActivo)
+                .map(this::mapearADto)
                 .orElse(null);
     }
 
-    public class EmpleadoServiceException extends RuntimeException {
-        public EmpleadoServiceException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
     @Transactional
     @Override
-    public EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado) {
+    public String guardarEmpleado(EmpleadoDtoRequest dto) {
         try {
-            return empleadoRepository.save(empleado);
+            EmpleadoEntity empleado = new EmpleadoEntity();
+            empleado.setNombre(dto.getNombre());
+            empleado.setApellido(dto.getApellido());
+            empleado.setPuesto(dto.getPuesto());
+            empleado.setSalario(dto.getSalario());
+            empleado.setFechaContratacion(dto.getFechaContratacion());
+            empleado.setActivo(true);
+
+            empleadoRepository.save(empleado);
+            return "Empleado creado exitosamente";
         } catch (DataAccessException e) {
-            throw new EmpleadoServiceException("Error de acceso a la base de datos", e);
-        } catch (Exception e) {
-            throw new EmpleadoServiceException("Error inesperado al guardar empleado", e);
+            throw new RuntimeException("Error de base de datos al guardar empleado", e);
         }
     }
 
-
     @Transactional
     @Override
-    public EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado) {
-
+    public String actualizarEmpleado(Integer id, EmpleadoDtoRequest dto) {
         try {
-
             EmpleadoEntity empleadoExistente = empleadoRepository.findById(id).orElse(null);
-            if (empleadoExistente != null) {
-                empleadoExistente.setNombre(empleado.getNombre());
-                empleadoExistente.setApellido(empleado.getApellido());
-                empleadoExistente.setPuesto(empleado.getPuesto());
-                empleadoExistente.setSalario(empleado.getSalario());
-                empleadoExistente.setFechaContratacion(empleado.getFechaContratacion());
-                return empleadoRepository.save(empleadoExistente);
+            if (empleadoExistente == null || !empleadoExistente.getActivo()) {
+                return "Empleado no encontrado o inactivo";
             }
-            return null;
 
+            empleadoExistente.setNombre(dto.getNombre());
+            empleadoExistente.setApellido(dto.getApellido());
+            empleadoExistente.setPuesto(dto.getPuesto());
+            empleadoExistente.setSalario(dto.getSalario());
+            empleadoExistente.setFechaContratacion(dto.getFechaContratacion());
+
+            empleadoRepository.save(empleadoExistente);
+            return "Empleado actualizado exitosamente";
         } catch (DataAccessException e) {
-            logger.error("Error de acceso a la base de datos al actualizar empleado con id {}: {}", id, e.getMessage());
-            return null;
-        } catch (Exception e) {
-            logger.error("Error inesperado al actualizar empleado con id {}: {}", id, e.getMessage());
-            return null;
+            throw new RuntimeException("Error de base de datos al actualizar empleado", e);
         }
     }
 
-
-    private static final Logger logger = LoggerFactory.getLogger(EmpleadoService.class);
     @Transactional
     @Override
     public boolean eliminarEmpleado(Integer id) {
@@ -93,16 +90,39 @@ public class EmpleadoService implements IEmpleadoService {
             }
             return false;
         } catch (DataAccessException e) {
-            logger.error("Error de acceso a la base de datos al eliminar empleado con id {}: {}", id, e.getMessage());
-            return false;
-        } catch (Exception e) {
-            logger.error("Error inesperado al eliminar empleado con id {}: {}", id, e.getMessage());
-            return false;
+            throw new RuntimeException("Error de acceso a la base de datos", e);
         }
     }
+
+    // --- TUS NUEVOS MÉTODOS JPA PERSONALIZADOS ---
+
+    @Override
+    public List<EmpleadoDtoResponse> buscarPorPuesto(String puesto) {
+        return empleadoRepository.findByPuesto(puesto)
+                .stream()
+                .filter(EmpleadoEntity::getActivo)
+                .map(this::mapearADto)
+                .toList();
+    }
+
+    @Override
+    public List<EmpleadoDtoResponse> buscarPorNombre(String nombre) {
+        return empleadoRepository.findByNombreContainingIgnoreCase(nombre)
+                .stream()
+                .filter(EmpleadoEntity::getActivo)
+                .map(this::mapearADto)
+                .toList();
+    }
+
+    // --- MÉTODO AUXILIAR (HELPER) PARA NO REPETIR CÓDIGO ---
+    private EmpleadoDtoResponse mapearADto(EmpleadoEntity empleado) {
+        EmpleadoDtoResponse dto = new EmpleadoDtoResponse();
+        dto.setId(empleado.getId());
+        dto.setNombre(empleado.getNombre());
+        dto.setApellido(empleado.getApellido());
+        dto.setPuesto(empleado.getPuesto());
+        dto.setSalario(empleado.getSalario());
+        dto.setFechaContratacion(empleado.getFechaContratacion());
+        return dto;
+    }
 }
-
-
-
-
-

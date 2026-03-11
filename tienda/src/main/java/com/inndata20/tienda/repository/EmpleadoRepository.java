@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface EmpleadoRepository extends JpaRepository<EmpleadoEntity,Integer> {
 
@@ -16,5 +18,13 @@ public interface EmpleadoRepository extends JpaRepository<EmpleadoEntity,Integer
     @Transactional
     void eliminarEmpleado(@Param("id") Integer id);
 
+
+    // JPA METODOS PERSONALIZADOS
+
+    // Buscar empleados por su puesto (ej. "Cajero", "Gerente")
+    List<EmpleadoEntity> findByPuesto(String puesto);
+
+    // Buscar empleados por nombre (coincidencia parcial sin importar mayúsculas/minúsculas)
+    List<EmpleadoEntity> findByNombreContainingIgnoreCase(String nombre);
 
 }

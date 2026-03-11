@@ -1,14 +1,20 @@
 package com.inndata20.tienda.service;
 
-import com.inndata20.tienda.entity.EmpleadoEntity;
+import com.inndata20.tienda.model.EmpleadoDtoRequest;
+import com.inndata20.tienda.model.EmpleadoDtoResponse;
+
 import java.util.List;
 
 public interface IEmpleadoService {
 
-    List<EmpleadoEntity> listarEmpleados();
-    EmpleadoEntity buscarPorId(Integer id);
-    EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado);
-    EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado);
+    List<EmpleadoDtoResponse> listarEmpleados();
+    EmpleadoDtoResponse buscarPorId(Integer id);
+    String guardarEmpleado(EmpleadoDtoRequest dto);
+    String actualizarEmpleado(Integer id, EmpleadoDtoRequest dto);
     boolean eliminarEmpleado(Integer id);
+
+    // --- MÉTODOS JPA PERSONALIZADOS ---
+    List<EmpleadoDtoResponse> buscarPorPuesto(String puesto);
+    List<EmpleadoDtoResponse> buscarPorNombre(String nombre);
 
 }

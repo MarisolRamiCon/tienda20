@@ -26,25 +26,25 @@ public class MockController {
         return ResponseEntity.ok(mockService.listarProductos());
     }
 
-    // 🆕 Buscar por ID
+    //  Buscar por ID
     @GetMapping("/listar/{id}")
     public ResponseEntity<APIMock> obtenerProducto(@PathVariable String id) {
         return ResponseEntity.ok(mockService.obtenerProducto(id));
     }
 
-    // 🆕 Crear
+    //  Crear
     @PostMapping("/crear")
     public ResponseEntity<APIMock> crearProducto(@RequestBody APIMock producto) {
         return ResponseEntity.ok(mockService.crearProducto(producto));
     }
 
-    // 🆕 Actualizar
+    //  Actualizar
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<APIMock> actualizarProducto(@PathVariable String id, @RequestBody APIMock producto) {
         return ResponseEntity.ok(mockService.actualizarProducto(id, producto));
     }
 
-    // 🆕 Eliminar
+    //  Eliminar
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable String id) {
         mockService.eliminarProducto(id);
