@@ -1,7 +1,7 @@
 package com.inndata20.tienda.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -9,5 +9,17 @@ import java.util.List;
 
 public interface ForaneoClient {
     @GetMapping("/foraneo")
-    public List<ForaneoEntity> readAll();
+    List<ForaneoEntity> readAll();
+
+    @GetMapping("/foraneo/{id}")
+    ForaneoEntity readById(@PathVariable int id);
+
+    @PostMapping("/foraneo")
+    ForaneoEntity create(ForaneoEntity foraneoEntity);
+
+    @PutMapping("/foraneo/{id}")
+    ForaneoEntity update(@PathVariable int id, ForaneoEntity foraneoEntity);
+
+    @DeleteMapping("/foraneo/{id}")
+    void delete(@PathVariable int id);
 }

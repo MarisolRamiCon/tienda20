@@ -22,4 +22,20 @@ public class ForaneoService implements IForaneoService {
         return foraneoClient.readAll();
     }
 
+    public ForaneoEntity readById(int id){
+        return foraneoClient.readById(id);
+    }
+
+    public ForaneoEntity create(ForaneoEntity foraneoEntity){
+        return foraneoClient.create(foraneoEntity);
+    }
+
+    public ForaneoEntity update(int id, ForaneoEntity foraneoEntity){
+        return foraneoClient.update(id, foraneoEntity);
+    }
+
+    public void delete(int id){
+        foraneoClient.delete(id);
+    }
+
 }

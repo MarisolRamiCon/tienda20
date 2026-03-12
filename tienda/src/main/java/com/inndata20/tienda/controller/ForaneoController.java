@@ -3,9 +3,7 @@ package com.inndata20.tienda.controller;
 import com.inndata20.tienda.feign.ForaneoEntity;
 import com.inndata20.tienda.service.implementacion.ForaneoService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,4 +24,23 @@ public class ForaneoController {
         return foraneoService.readAll();
     }
 
+    @GetMapping("/foraneo/{id}")
+    public ForaneoEntity readById(@PathVariable int id) {
+        return foraneoService.readById(id);
+    }
+
+    @PostMapping("/foraneo")
+    public ForaneoEntity create(@RequestBody ForaneoEntity foraneoEntity) {
+        return foraneoService.create(foraneoEntity);
+    }
+
+    @PutMapping("/foraneo/{id}")
+    public ForaneoEntity update(@PathVariable int id, @RequestBody ForaneoEntity foraneoEntity) {
+        return foraneoService.update(id, foraneoEntity);
+    }
+
+    @DeleteMapping("/foraneo/{id}")
+    public void delete(@PathVariable int id){
+        foraneoService.delete(id);
+    }
 }
