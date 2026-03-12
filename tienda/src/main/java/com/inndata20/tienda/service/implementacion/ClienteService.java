@@ -27,8 +27,28 @@ public class ClienteService implements IClienteService {
     @Override
     public List<ClienteDtoResponse> readAll() {
         log.info("Solicitando lista de clientes");
-        return clienteRepository.findByActivoTrue().stream().map(
-                cliente ->
+        try {
+            return clienteRepository.findByActivoTrue().stream().map(
+                    cliente ->
+                            new ClienteDtoResponse(
+                                    cliente.getId(),
+                                    cliente.getNombre(),
+                                    cliente.getApellido(),
+                                    cliente.getDireccion(),
+                                    cliente.getCorreo(),
+                                    cliente.getTelefono()
+                            )
+            ).toList();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<ClienteDtoResponse> readById(int id){
+        log.info("Solicitando el cliente por id: {id}");
+        try {
+            return clienteRepository.findById(id).map(cliente ->
                     new ClienteDtoResponse(
                             cliente.getId(),
                             cliente.getNombre(),
@@ -37,22 +57,10 @@ public class ClienteService implements IClienteService {
                             cliente.getCorreo(),
                             cliente.getTelefono()
                     )
-        ).toList();
-    }
-
-    @Override
-    public Optional<ClienteDtoResponse> readById(int id){
-        log.info("Solicitando el cliente por id: {id}");
-        return clienteRepository.findById(id).map(cliente ->
-                new ClienteDtoResponse(
-                    cliente.getId(),
-                    cliente.getNombre(),
-                    cliente.getApellido(),
-                    cliente.getDireccion(),
-                    cliente.getCorreo(),
-                    cliente.getTelefono()
-            )
-        );
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

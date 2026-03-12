@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class PedidoDtoResponse {
-
+    private Integer id;
     private LocalDate fechaPedido;
     private Double total;
     private Integer clienteId;

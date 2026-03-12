@@ -1,12 +1,12 @@
 package com.inndata20.tienda.controller;
 
-import com.inndata20.tienda.entity.DetallePedidoEntity;
+import com.inndata20.tienda.model.DetallePedidoRequest;
+import com.inndata20.tienda.model.DetallePedidoResponse;
+import com.inndata20.tienda.model.MensajeStrResponse;
 import com.inndata20.tienda.service.implementacion.DetallePedidoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -20,8 +20,28 @@ public class DetallePedidoController {
         this.detallePedidoService = detallePedidoService;
     }
 
+    @GetMapping("/detallepedidos")
+    public List<DetallePedidoResponse> readAll() {
+        return detallePedidoService.readAll();
+    }
+
     @GetMapping("/detallepedido/{id}")
-    public Optional<DetallePedidoEntity> readById(@PathVariable int id) {
+    public Optional<DetallePedidoResponse> readById(@PathVariable int id) {
         return detallePedidoService.readById(id);
+    }
+
+    @PatchMapping("/detallepedido/{id}")
+    public MensajeStrResponse update(@PathVariable int id, @RequestBody DetallePedidoRequest detallePedido) {
+        return detallePedidoService.updateById(id,detallePedido);
+    }
+
+    @PutMapping("/detallepedido/{id}")
+    public MensajeStrResponse delete(@PathVariable int id) {
+        return detallePedidoService.deleteById(id);
+    }
+
+    @PostMapping("/detallepedido")
+    public MensajeStrResponse create(@RequestBody DetallePedidoRequest detallePedido) {
+        return detallePedidoService.create(detallePedido);
     }
 }
