@@ -19,5 +19,8 @@ public interface IProductoService {
     // Filtrar por stock entre X y Y
     List<ProductoDtoResponse> buscarPorStockEntre(Integer stockMin, Integer stockMax);
 
+    // QUERYS PERSONALIZADOS
+    List<ProductoDtoResponse> buscarPorNombreYCategoria(String nombre, String categoria);
+    List<ProductoDtoResponse> buscarPorProveedor(Integer proveedorId);
 
 }

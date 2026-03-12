@@ -22,11 +22,23 @@ public interface ProductoRepository extends JpaRepository<ProductoEntity, Intege
     @Transactional
     void eliminarProducto(@Param("id") Integer id);
 
-// Voy a seleccionar los productos que pertenezcan a la misma categoria, pero que el precio sea menor al que voy a colorcar
+    // JPA PERSONALIZADOS
 
-    public List<ProductoEntity>findByCategoriaAndPrecioLessThan(String categoria, Double precio);
+        // Voy a seleccionar los productos que pertenezcan a la misma categoria, pero que el precio sea menor al que voy a colorcar
 
-    // Seleccionar productos cuyo stock esté entre X y Y
-    public List<ProductoEntity> findByStockBetween(Integer stockMin, Integer stockMax);
+        public List<ProductoEntity>findByCategoriaAndPrecioLessThan(String categoria, Double precio);
 
+        // Seleccionar productos cuyo stock esté entre X y Y
+
+        public List<ProductoEntity> findByStockBetween(Integer stockMin, Integer stockMax);
+
+
+    // QUERYS
+
+    @Query("SELECT p FROM ProductoEntity p WHERE LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%')) AND p.categoria = :categoria AND p.activo = true")
+    List<ProductoEntity> buscarPorNombreYCategoria(@Param("nombre") String nombre, @Param("categoria") String categoria);
+
+    // Buscar productos activos por proveedor
+    @Query("SELECT p FROM ProductoEntity p WHERE p.proveedor.id = :proveedorId AND p.activo = true")
+    List<ProductoEntity> buscarPorProveedor(@Param("proveedorId") Integer proveedorId);
 }

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 @Data
 public class EmpleadoDtoRequest {
+    private Integer id;
     private String nombre;
     private String apellido;
     private String puesto;

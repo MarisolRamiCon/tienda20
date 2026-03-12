@@ -25,5 +25,14 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity,Integer> {
     // Buscar por cliente
     List<PedidoEntity> findByCliente_Id(Integer clienteId);
 
+    // QUERYS PERSONALIZADOS
+
+    // Buscar pedidos por rango de total
+    @Query("SELECT p FROM PedidoEntity p WHERE p.total BETWEEN :min AND :max AND p.activo = true")
+    List<PedidoEntity> buscarPorRangoTotal(@Param("min") Double min, @Param("max") Double max);
+
+    // Buscar pedidos activos de un cliente específico
+    @Query("SELECT p FROM PedidoEntity p WHERE p.cliente.id = :clienteId AND p.activo = true")
+    List<PedidoEntity> buscarPedidosActivosPorCliente(@Param("clienteId") Integer clienteId);
 
 }

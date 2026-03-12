@@ -2,6 +2,7 @@ package com.inndata20.tienda.service.implementacion;
 
 import com.inndata20.tienda.entity.ProductoEntity;
 import com.inndata20.tienda.entity.ProveedoresEntity;
+import com.inndata20.tienda.model.EmpleadoDtoResponse;
 import com.inndata20.tienda.model.ProductoDtoRequest;
 import com.inndata20.tienda.model.ProductoDtoResponse;
 import com.inndata20.tienda.repository.ProductoRepository;
@@ -13,6 +14,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j // ✅ Agregamos la anotación para usar log
@@ -147,25 +150,87 @@ public class ProductoService implements IProductoService {
         }
     }
 
+
+
+    // JPA PERSONALIZADOS
+
+
     @Override
     public List<ProductoDtoResponse> buscarPorCategoriaYPrecio(String categoria, Double precio) {
         log.info("Service: Consultando BD por categoría '{}' y precio menor a {}", categoria, precio);
-        return productoRepository.findByCategoriaAndPrecioLessThan(categoria, precio)
-                .stream()
-                .filter(ProductoEntity::getActivo)
-                .map(this::mapearADto)
-                .toList();
+        try {
+            return productoRepository.findByCategoriaAndPrecioLessThan(categoria, precio)
+                    .stream()
+                    .filter(ProductoEntity::getActivo)
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por categoría '{}' y precio", categoria, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por categoría '{}' y precio", categoria, e);
+            return List.of();
+        }
     }
 
     @Override
     public List<ProductoDtoResponse> buscarPorStockEntre(Integer stockMin, Integer stockMax) {
         log.info("Service: Consultando BD por stock entre {} y {}", stockMin, stockMax);
-        return productoRepository.findByStockBetween(stockMin, stockMax)
-                .stream()
-                .filter(ProductoEntity::getActivo)
-                .map(this::mapearADto)
-                .toList();
+        try {
+            return productoRepository.findByStockBetween(stockMin, stockMax)
+                    .stream()
+                    .filter(ProductoEntity::getActivo)
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por stock entre {} y {}", stockMin, stockMax, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por stock entre {} y {}", stockMin, stockMax, e);
+            return List.of();
+        }
     }
+
+// QUERYS PERSONALIZADOS
+
+    @Override
+    public List<ProductoDtoResponse> buscarPorNombreYCategoria(String nombre, String categoria) {
+        log.info("Service: Consultando BD por nombre '{}' y categoría '{}'", nombre, categoria);
+        try {
+            return productoRepository.buscarPorNombreYCategoria(nombre, categoria)
+                    .stream()
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por nombre '{}' y categoría '{}'", nombre, categoria, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por nombre '{}' y categoría '{}'", nombre, categoria, e);
+            return List.of();
+        }
+    }
+
+    @Override
+    public List<ProductoDtoResponse> buscarPorProveedor(Integer proveedorId) {
+        log.info("Service: Consultando BD por proveedor con ID: {}", proveedorId);
+        try {
+            return productoRepository.buscarPorProveedor(proveedorId)
+                    .stream()
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por proveedor ID: {}", proveedorId, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por proveedor ID: {}", proveedorId, e);
+            return List.of();
+        }
+    }
+
+
+
+
+
 
     // --- MÉTODO AUXILIAR PARA NO REPETIR CÓDIGO ---
     private ProductoDtoResponse mapearADto(ProductoEntity producto) {
