@@ -75,7 +75,7 @@ public class DetallePedidoService implements IDetallePedidoService {
             detallePedidoRepository.save(nuevoDetallePedido);
             return new MensajeStrResponse("Detalle registrado exitosamente");
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return new MensajeStrResponse(e.getMessage());
         }
     }
@@ -111,7 +111,12 @@ public class DetallePedidoService implements IDetallePedidoService {
         if (solicitud.isPresent()) {
             DetallePedidoEntity detallePedido = solicitud.get();
             detallePedido.setActivo(false);
-            detallePedidoRepository.save(detallePedido);
+            try {
+                detallePedidoRepository.save(detallePedido);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                return new MensajeStrResponse(e.getMessage());
+            }
             return new MensajeStrResponse("Detalle eliminado exitosamente");
         } else {
             return new MensajeStrResponse("El detalle no existe");

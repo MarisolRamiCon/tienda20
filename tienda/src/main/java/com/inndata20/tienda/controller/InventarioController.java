@@ -1,11 +1,10 @@
 package com.inndata20.tienda.controller;
 
-import com.inndata20.tienda.entity.InventarioEntity;
+import com.inndata20.tienda.model.InventarioRequest;
+import com.inndata20.tienda.model.InventarioResponse;
+import com.inndata20.tienda.model.MensajeStrResponse;
 import com.inndata20.tienda.service.implementacion.InventarioService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,13 +20,28 @@ public class InventarioController {
     }
 
     @GetMapping("/inventarios")
-    public List<InventarioEntity> readAll()
+    public List<InventarioResponse> readAll()
     {
         return inventarioService.readAll();
     }
 
     @GetMapping("/inventario/{id}")
-    public InventarioEntity readById(@PathVariable int id){
+    public InventarioResponse readById(@PathVariable int id){
         return inventarioService.readById(id);
+    }
+
+    @PostMapping("/inventarios")
+    public MensajeStrResponse create(@RequestBody InventarioRequest inventarioRequest){
+        return inventarioService.create(inventarioRequest);
+    }
+
+    @PatchMapping("/inventario/{id}")
+    public MensajeStrResponse updateById(@PathVariable int id, @RequestBody InventarioRequest inventarioRequest) {
+        return inventarioService.updateById(id, inventarioRequest);
+    }
+
+    @PutMapping("/inventario/{id}")
+    public MensajeStrResponse deleteById(@PathVariable int id) {
+        return inventarioService.deleteById(id);
     }
 }
