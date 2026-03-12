@@ -4,6 +4,7 @@ package com.inndata20.tienda.service.implementacion;
 import com.inndata20.tienda.entity.ClienteEntity;
 import com.inndata20.tienda.model.ClienteDtoRequest;
 import com.inndata20.tienda.model.ClienteDtoResponse;
+import com.inndata20.tienda.model.MensajeStrResponse;
 import com.inndata20.tienda.repository.ClienteRepository;
 import com.inndata20.tienda.service.IClienteService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class ClienteService implements IClienteService {
     @Override
     public List<ClienteDtoResponse> readAll() {
         log.info("Solicitando lista de clientes");
-        return clienteRepository.findByActivoNotNull().stream().map(
+        return clienteRepository.findByActivoTrue().stream().map(
                 cliente ->
                     new ClienteDtoResponse(
                             cliente.getId(),
@@ -55,7 +56,7 @@ public class ClienteService implements IClienteService {
     }
 
     @Override
-    public String create(ClienteDtoRequest cliente){
+    public MensajeStrResponse create(ClienteDtoRequest cliente){
         log.info("Creando nuevo registro de cliente");
         ClienteEntity nuevoCliente = new ClienteEntity();
         nuevoCliente.setNombre(cliente.getNombre());
@@ -67,17 +68,17 @@ public class ClienteService implements IClienteService {
         if (nuevoCliente.getCorreo() != null || nuevoCliente.getTelefono() != null){
             try {
                 clienteRepository.save(nuevoCliente);
-                return "Cliente registrado exitosamente";
+                return new MensajeStrResponse("Cliente registrado exitosamente");
             } catch (Exception e) {
-                return e.getMessage();
+                return new MensajeStrResponse(e.getMessage());
             }
         } else  {
-            return "El cliente debe registrar un correo y/o un numero de teléfono";
+            return new MensajeStrResponse("El cliente debe registrar un correo y/o un numero de teléfono");
         }
     }
 
     @Override
-    public String updateById(int id, ClienteDtoRequest entrada){
+    public MensajeStrResponse updateById(int id, ClienteDtoRequest entrada){
         log.info("Solicitando la modificación del cliente por id: {id}");
         Optional<ClienteEntity> solicitud = clienteRepository.findById(id);
         if (solicitud.isPresent()) {
@@ -91,31 +92,31 @@ public class ClienteService implements IClienteService {
 
             try {
                 clienteRepository.save(cliente);
-                return "Cliente modificado exitosamente";
+                return new MensajeStrResponse("Cliente registrado exitosamente");
             } catch (Exception e) {
-                return e.getMessage();
+                return new MensajeStrResponse(e.getMessage());
             }
         }else  {
-            return "El cliente no existe";
+            return new MensajeStrResponse("El cliente no existe");
         }
     }
 
     @Override
-    public String deleteById(int id){
+    public MensajeStrResponse deleteById(int id){
         log.info("Solicitando la eliminación del cliente por id: {id}");
         Optional<ClienteEntity> solicitud = clienteRepository.findById(id);
         if (solicitud.isPresent()) {
             ClienteEntity cliente = solicitud.get();
             cliente.setActivo(false);
             clienteRepository.save(cliente);
-            return "Cliente eliminado exitosamente";
+            return new MensajeStrResponse("Cliente eliminado exitosamente");
         } else {
-            return "El cliente no se encontró el registro";
+            return new MensajeStrResponse("El cliente no se encontró el registro");
         }
     }
 
     public List<ClienteDtoResponse> searchByName(String busqueda){
-        return clienteRepository.findByNombre(busqueda).stream().map(cliente ->
+        return clienteRepository.searchByNombre(busqueda).stream().map(cliente ->
                 new ClienteDtoResponse(
                         cliente.getId(),
                         cliente.getNombre(),

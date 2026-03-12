@@ -2,6 +2,7 @@ package com.inndata20.tienda.controller;
 
 import com.inndata20.tienda.model.ClienteDtoRequest;
 import com.inndata20.tienda.model.ClienteDtoResponse;
+import com.inndata20.tienda.model.MensajeStrResponse;
 import com.inndata20.tienda.service.implementacion.ClienteService;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,12 +31,12 @@ public class ClienteController {
     }
 
     @PostMapping("/clientes")
-    public String create(@RequestBody ClienteDtoRequest clienteDtoRequest) {
+    public MensajeStrResponse create(@RequestBody ClienteDtoRequest clienteDtoRequest) {
         return clienteService.create(clienteDtoRequest);
     }
 
     @PatchMapping("/cliente/{id}")
-    public String update(@PathVariable int id, @RequestBody ClienteDtoRequest clienteDtoRequest) {
+    public MensajeStrResponse update(@PathVariable int id, @RequestBody ClienteDtoRequest clienteDtoRequest) {
         return clienteService.updateById(id, clienteDtoRequest);
     }
 
@@ -45,7 +46,7 @@ public class ClienteController {
     }
 
     @PutMapping("/cliente/{id}")
-    public String delete(@PathVariable int id) {
+    public MensajeStrResponse delete(@PathVariable int id) {
         return clienteService.deleteById(id);
     }
 }

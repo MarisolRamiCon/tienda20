@@ -11,6 +11,6 @@ import java.util.List;
 
 public interface ClienteRepository extends JpaRepository<ClienteEntity,Integer> {
     @Query(value = "SELECT * FROM clientes WHERE UPPER(nombre) LIKE UPPER(CONCAT('%', ?1, '%'))", nativeQuery = true)
-    public List<ClienteEntity> findByNombre(String busqueda);
-    public List<ClienteEntity> findByActivoNotNull();
+    List<ClienteEntity> searchByNombre(String busqueda);//Cambiar nombre de la funcion por posible JPA hecho
+    List<ClienteEntity> findByActivoTrue();
 }

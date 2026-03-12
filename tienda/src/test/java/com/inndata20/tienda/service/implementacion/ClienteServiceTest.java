@@ -3,6 +3,7 @@ package com.inndata20.tienda.service.implementacion;
 import com.inndata20.tienda.entity.ClienteEntity;
 import com.inndata20.tienda.model.ClienteDtoRequest;
 import com.inndata20.tienda.model.ClienteDtoResponse;
+import com.inndata20.tienda.model.MensajeStrResponse;
 import com.inndata20.tienda.repository.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,9 @@ class ClienteServiceTest {
 
     @Test
     void readAll() {
-        Mockito.when(clienteRepository.findAll()).thenReturn(Arrays.asList(cliente1,cliente2,cliente3,cliente4));
-        List<ClienteDtoResponse> salida =  clienteService.readAll();
+        List<ClienteEntity> data = Arrays.asList(cliente1, cliente2, cliente4);
+        Mockito.when(clienteRepository.findByActivoTrue()).thenReturn(data);
+        List<ClienteDtoResponse> salida = clienteService.readAll();
         assertEquals(3,salida.size());
     }
 
@@ -62,9 +64,8 @@ class ClienteServiceTest {
         clienteNuevo.setApellido("Sigma");
         clienteNuevo.setDireccion("Porai");
         clienteNuevo.setTelefono("1234567890");
-        ClienteDtoRequest clienteErroneo = new ClienteDtoRequest();
-        String salida = clienteService.create(clienteNuevo);
-        assertEquals("Cliente registrado exitosamente",salida);
+        MensajeStrResponse salida = clienteService.create(clienteNuevo);
+        assertEquals("Cliente registrado exitosamente",salida.getMensaje());
 
     }
 }
