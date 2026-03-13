@@ -45,27 +45,26 @@ public class EmpleadoService implements IEmpleadoService {
         }
     }
 
-    // CORRECCIÓN: Cambiamos EmpleadoDtoRequest por Integer id para mantener consistencia
     @Override
-    public EmpleadoDtoResponse buscarPorId(Integer id) {
-        log.info("Service: Buscando empleado por ID: {}", id);
+    public EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoRequest) {
+        log.info("Service: Buscando empleado por ID: {}", empleadoRequest.getId());
         try {
-            EmpleadoDtoResponse response = empleadoRepository.findById(id)
+            EmpleadoDtoResponse response = empleadoRepository.findById(empleadoRequest.getId())
                     .filter(EmpleadoEntity::getActivo)
                     .map(this::mapearADto)
                     .orElse(null);
 
             if (response == null) {
-                log.warn("Service: Empleado con ID {} no encontrado o está inactivo", id);
+                log.warn("Service: Empleado con ID {} no encontrado o está inactivo", empleadoRequest.getId());
             } else {
                 log.info("Service: Empleado '{}' encontrado con éxito", response.getNombre());
             }
             return response;
         } catch (DataAccessException e) {
-            log.error("Service: Error de BD al buscar empleado con ID {}", id, e);
+            log.error("Service: Error de BD al buscar empleado con ID {}", empleadoRequest.getId(), e);
             return null;
         } catch (Exception e) {
-            log.error("Service: Error inesperado al buscar empleado con ID {}", id, e);
+            log.error("Service: Error inesperado al buscar empleado con ID {}", empleadoRequest.getId(), e);
             return null;
         }
     }
