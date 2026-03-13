@@ -27,20 +27,28 @@ public class PedidoController {
 
     // GET a /api/v1/pedidos
     @GetMapping
-    public ResponseEntity<List<PedidoDtoResponse>> listarPedidos() {
+    public ResponseEntity<?> listarPedidos() {
         log.info("REST Request: Solicitando la lista de todos los pedidos");
-        return ResponseEntity.ok(pedidoService.listarPedidos());
+        List<PedidoDtoResponse> pedidos = pedidoService.listarPedidos();
+
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron pedidos activos", false));
+        }
+        return ResponseEntity.ok(pedidos);
     }
 
     // GET a /api/v1/pedidos/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoDtoResponse> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando pedido con ID: {}", id);
         PedidoDtoResponse pedido = pedidoService.buscarPorId(id);
+
         if (pedido == null) {
-            return ResponseEntity.notFound().build(); // Retorna 404 si no existe
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("Pedido con ID " + id + " no encontrado", false));
         }
-        return ResponseEntity.ok(pedido); // Retorna 200 OK si lo encuentra
+        return ResponseEntity.ok(pedido);
     }
 
     // POST a /api/v1/pedidos
@@ -49,10 +57,10 @@ public class PedidoController {
         log.info("REST Request: Petición para guardar un nuevo pedido del cliente ID: {}", pedidoRequest.getClienteId());
         MensajeDtoResponse response = pedidoService.guardarPedido(pedidoRequest);
 
-        if (response.getExito()) { // Asumo que MensajeDtoResponse tiene un boolean de éxito, si no, lo ajustamos
+        if (response.getExito()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retorna 201 Created
         }
-        return ResponseEntity.badRequest().body(response); // Retorna 400 Bad Request si falló la validación (ej. no existe cliente)
+        return ResponseEntity.badRequest().body(response); // Retorna 400 Bad Request
     }
 
     // PUT a /api/v1/pedidos/{id}
@@ -79,35 +87,63 @@ public class PedidoController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    // ==========================================
     // METODOS JPA PERSONALIZADOS
+    // ==========================================
 
     @GetMapping("/fechas")
-    public ResponseEntity<List<PedidoDtoResponse>> buscarPorRangoFechas(
+    public ResponseEntity<?> buscarPorRangoFechas(
             @RequestParam LocalDate fechaInicio,
             @RequestParam LocalDate fechaFin) {
         log.info("REST Request: Buscando pedidos entre {} y {}", fechaInicio, fechaFin);
-        return ResponseEntity.ok(pedidoService.buscarPorRangoFechas(fechaInicio, fechaFin));
+        List<PedidoDtoResponse> pedidos = pedidoService.buscarPorRangoFechas(fechaInicio, fechaFin);
+
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron pedidos en ese rango de fechas", false));
+        }
+        return ResponseEntity.ok(pedidos);
     }
 
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<PedidoDtoResponse>> buscarPorCliente(@PathVariable Integer clienteId) {
+    public ResponseEntity<?> buscarPorCliente(@PathVariable Integer clienteId) {
         log.info("REST Request: Buscando pedidos del cliente con ID: {}", clienteId);
-        return ResponseEntity.ok(pedidoService.buscarPorCliente(clienteId));
+        List<PedidoDtoResponse> pedidos = pedidoService.buscarPorCliente(clienteId);
+
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron pedidos para el cliente con ID: " + clienteId, false));
+        }
+        return ResponseEntity.ok(pedidos);
     }
 
+    // ==========================================
     // QUERYS PERSONALIZADOS
+    // ==========================================
 
     @GetMapping("/total")
-    public ResponseEntity<List<PedidoDtoResponse>> buscarPorRangoTotal(
+    public ResponseEntity<?> buscarPorRangoTotal(
             @RequestParam Double rangoMin,
             @RequestParam Double rangoMax) {
         log.info("REST Request: Buscando pedidos con total entre {} y {}", rangoMin, rangoMax);
-        return ResponseEntity.ok(pedidoService.buscarPorRangoTotal(rangoMin, rangoMax));
+        List<PedidoDtoResponse> pedidos = pedidoService.buscarPorRangoTotal(rangoMin, rangoMax);
+
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron pedidos en ese rango de total", false));
+        }
+        return ResponseEntity.ok(pedidos);
     }
 
-    @GetMapping("/cliente/{clienteId}/activos") // Ajusté un poco la ruta para que sea más RESTful
-    public ResponseEntity<List<PedidoDtoResponse>> buscarPedidosActivosPorCliente(@PathVariable Integer clienteId) {
+    @GetMapping("/cliente/{clienteId}/activos")
+    public ResponseEntity<?> buscarPedidosActivosPorCliente(@PathVariable Integer clienteId) {
         log.info("REST Request: Buscando pedidos activos del cliente con ID: {}", clienteId);
-        return ResponseEntity.ok(pedidoService.buscarPedidosActivosPorCliente(clienteId));
+        List<PedidoDtoResponse> pedidos = pedidoService.buscarPedidosActivosPorCliente(clienteId);
+
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron pedidos activos para el cliente con ID: " + clienteId, false));
+        }
+        return ResponseEntity.ok(pedidos);
     }
 }

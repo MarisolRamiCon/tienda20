@@ -26,21 +26,28 @@ public class ProductoController {
 
     // GET a /api/v1/productos
     @GetMapping
-    public ResponseEntity<List<ProductoDtoResponse>> listarProductos() {
+    public ResponseEntity<?> listarProductos() {
         log.info("REST Request: Solicitando la lista de todos los productos");
-        return ResponseEntity.ok(productoService.listarProductos());
+        List<ProductoDtoResponse> productos = productoService.listarProductos();
+
+        if (productos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron productos activos", false));
+        }
+        return ResponseEntity.ok(productos);
     }
 
     // GET a /api/v1/productos/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoDtoResponse> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando producto con ID: {}", id);
         ProductoDtoResponse producto = productoService.buscarPorId(id);
 
         if (producto == null) {
-            return ResponseEntity.notFound().build(); // Retorna 404 si no existe
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("Producto con ID " + id + " no encontrado", false));
         }
-        return ResponseEntity.ok(producto); // Retorna 200 OK si lo encuentra
+        return ResponseEntity.ok(producto);
     }
 
     // POST a /api/v1/productos
@@ -83,34 +90,58 @@ public class ProductoController {
     // METODOS JPA Y QUERYS PERSONALIZADOS
     // ==========================================
 
-    @GetMapping("/categoria") // Le quitamos el "buscar"
-    public ResponseEntity<List<ProductoDtoResponse>> buscarPorCategoriaYPrecio(
+    @GetMapping("/categoria")
+    public ResponseEntity<?> buscarPorCategoriaYPrecio(
             @RequestParam String categoria,
             @RequestParam Double precio) {
         log.info("REST Request: Buscando productos de la categoría '{}' con precio menor a {}", categoria, precio);
-        return ResponseEntity.ok(productoService.buscarPorCategoriaYPrecio(categoria, precio));
+        List<ProductoDtoResponse> productos = productoService.buscarPorCategoriaYPrecio(categoria, precio);
+
+        if (productos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron productos en la categoría: " + categoria + " con precio menor a " + precio, false));
+        }
+        return ResponseEntity.ok(productos);
     }
 
-    @GetMapping("/stock") // Le quitamos el "buscar"
-    public ResponseEntity<List<ProductoDtoResponse>> buscarPorStockEntre(
+    @GetMapping("/stock")
+    public ResponseEntity<?> buscarPorStockEntre(
             @RequestParam Integer stockMin,
             @RequestParam Integer stockMax) {
         log.info("REST Request: Buscando productos con stock entre {} y {}", stockMin, stockMax);
-        return ResponseEntity.ok(productoService.buscarPorStockEntre(stockMin, stockMax));
+        List<ProductoDtoResponse> productos = productoService.buscarPorStockEntre(stockMin, stockMax);
+
+        if (productos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron productos en ese rango de stock", false));
+        }
+        return ResponseEntity.ok(productos);
     }
 
-    @GetMapping("/busqueda") // Queda más limpio usar un endpoint genérico para filtros
-    public ResponseEntity<List<ProductoDtoResponse>> buscarPorNombreYCategoria(
+    @GetMapping("/busqueda")
+    public ResponseEntity<?> buscarPorNombreYCategoria(
             @RequestParam String nombre,
             @RequestParam String categoria) {
         log.info("REST Request: Buscando productos con nombre '{}' y categoría '{}'", nombre, categoria);
-        return ResponseEntity.ok(productoService.buscarPorNombreYCategoria(nombre, categoria));
+        List<ProductoDtoResponse> productos = productoService.buscarPorNombreYCategoria(nombre, categoria);
+
+        if (productos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron productos con el nombre y categoría especificados", false));
+        }
+        return ResponseEntity.ok(productos);
     }
 
-    @GetMapping("/proveedor/{proveedorId}") // Le quitamos el "buscar"
-    public ResponseEntity<List<ProductoDtoResponse>> buscarPorProveedor(
+    @GetMapping("/proveedor/{proveedorId}")
+    public ResponseEntity<?> buscarPorProveedor(
             @PathVariable Integer proveedorId) {
         log.info("REST Request: Buscando productos del proveedor con ID: {}", proveedorId);
-        return ResponseEntity.ok(productoService.buscarPorProveedor(proveedorId));
+        List<ProductoDtoResponse> productos = productoService.buscarPorProveedor(proveedorId);
+
+        if (productos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron productos para el proveedor con ID: " + proveedorId, false));
+        }
+        return ResponseEntity.ok(productos);
     }
 }
