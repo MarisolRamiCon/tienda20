@@ -33,59 +33,75 @@ public class PedidoService implements IPedidoService {
     @Override
     public List<PedidoDtoResponse> listarPedidos() {
         log.info("Service: Consultando todos los pedidos activos en la base de datos");
-        return pedidoRepository.findAll()
-                .stream()
-                .filter(PedidoEntity::getActivo)
-                .map(pedido -> {
-                    PedidoDtoResponse dto = new PedidoDtoResponse();
-                    dto.setFechaPedido(pedido.getFechaPedido());
-                    dto.setTotal(pedido.getTotal());
-                    dto.setClienteId(pedido.getCliente().getId());
-                    return dto;
-                })
-                .toList();
+        try {
+            return pedidoRepository.findAll()
+                    .stream()
+                    .filter(PedidoEntity::getActivo)
+                    .map(pedido -> {
+                        PedidoDtoResponse pedidoRequest = new PedidoDtoResponse();
+                        pedidoRequest.setFechaPedido(pedido.getFechaPedido());
+                        pedidoRequest.setTotal(pedido.getTotal());
+                        pedidoRequest.setClienteId(pedido.getCliente().getId());
+                        return pedidoRequest;
+                    })
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al consultar pedidos", e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al consultar pedidos", e);
+            return List.of();
+        }
     }
 
     @Override
     public PedidoDtoResponse buscarPorId(Integer id) {
         log.info("Service: Buscando pedido por ID: {}", id);
-        PedidoDtoResponse response = pedidoRepository.findById(id)
-                .filter(PedidoEntity::getActivo)
-                .map(pedido -> {
-                    PedidoDtoResponse dto = new PedidoDtoResponse();
-                    dto.setFechaPedido(pedido.getFechaPedido());
-                    dto.setTotal(pedido.getTotal());
-                    dto.setClienteId(pedido.getCliente().getId());
-                    return dto;
-                })
-                .orElse(null);
+        try {
+            PedidoDtoResponse response = pedidoRepository.findById(id)
+                    .filter(PedidoEntity::getActivo)
+                    .map(pedido -> {
+                        PedidoDtoResponse dto = new PedidoDtoResponse();
+                        dto.setFechaPedido(pedido.getFechaPedido());
+                        dto.setTotal(pedido.getTotal());
+                        dto.setClienteId(pedido.getCliente().getId());
+                        return dto;
+                    })
+                    .orElse(null);
 
-        if (response == null) {
-            log.warn("Service: Pedido con ID {} no encontrado o está inactivo", id);
-        } else {
-            log.info("Service: Pedido con ID {} encontrado con éxito", id);
+            if (response == null) {
+                log.warn("Service: Pedido con ID {} no encontrado o está inactivo", id);
+            } else {
+                log.info("Service: Pedido con ID {} encontrado con éxito", id);
+            }
+            return response;
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar pedido con ID {}", id, e);
+            return null;
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar pedido con ID {}", id, e);
+            return null;
         }
-        return response;
     }
 
     @Transactional
     @Override
-    public MensajeDtoResponse guardarPedido(PedidoDtoRequest dto) {
-        log.info("Service: Iniciando proceso para guardar nuevo pedido del cliente ID: {}", dto.getClienteId());
+    public MensajeDtoResponse guardarPedido(PedidoDtoRequest pedidoRequest) {
+        log.info("Service: Iniciando proceso para guardar nuevo pedido del cliente ID: {}", pedidoRequest.getClienteId());
         try {
-            ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+            ClienteEntity cliente = clienteRepository.findById(pedidoRequest.getClienteId()).orElse(null);
             if (cliente == null) {
-                log.warn("Service: Error al guardar. No se encontró el cliente con ID: {}", dto.getClienteId());
+                log.warn("Service: Error al guardar. No se encontró el cliente con ID: {}", pedidoRequest.getClienteId());
                 return new MensajeDtoResponse("Error: Cliente no encontrado ", false);
             }
 
             PedidoEntity pedido = new PedidoEntity();
-            pedido.setFechaPedido(dto.getFechaPedido());
-            pedido.setTotal(dto.getTotal());
+            pedido.setFechaPedido(pedidoRequest.getFechaPedido());
+            pedido.setTotal(pedidoRequest.getTotal());
             pedido.setActivo(true);
             pedido.setCliente(cliente);
             pedidoRepository.save(pedido);
-            log.info("Service: Pedido guardado exitosamente para el cliente ID: {}", dto.getClienteId());
+            log.info("Service: Pedido guardado exitosamente para el cliente ID: {}", pedidoRequest.getClienteId());
             return new MensajeDtoResponse("Pedido guardado exitosamente", true);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar guardar el pedido", e);
@@ -98,7 +114,7 @@ public class PedidoService implements IPedidoService {
 
     @Transactional
     @Override
-    public MensajeDtoResponse actualizarPedido(Integer id, PedidoDtoRequest dto) {
+    public MensajeDtoResponse actualizarPedido(Integer id, PedidoDtoRequest pedidoRequest) {
         log.info("Service: Iniciando proceso de actualización para el pedido ID: {}", id);
         try {
             PedidoEntity pedidoExistente = pedidoRepository.findById(id).orElse(null);
@@ -107,14 +123,14 @@ public class PedidoService implements IPedidoService {
                 return new MensajeDtoResponse("Pedido no encontrado", false);
             }
 
-            ClienteEntity cliente = clienteRepository.findById(dto.getClienteId()).orElse(null);
+            ClienteEntity cliente = clienteRepository.findById(pedidoRequest.getClienteId()).orElse(null);
             if (cliente == null) {
-                log.warn("Service: No se puede actualizar. Cliente con ID {} no encontrado", dto.getClienteId());
+                log.warn("Service: No se puede actualizar. Cliente con ID {} no encontrado", pedidoRequest.getClienteId());
                 return new MensajeDtoResponse("Cliente no encontrado", false);
             }
 
-            pedidoExistente.setFechaPedido(dto.getFechaPedido());
-            pedidoExistente.setTotal(dto.getTotal());
+            pedidoExistente.setFechaPedido(pedidoRequest.getFechaPedido());
+            pedidoExistente.setTotal(pedidoRequest.getTotal());
             pedidoExistente.setCliente(cliente);
 
             pedidoRepository.save(pedidoExistente);
@@ -132,22 +148,22 @@ public class PedidoService implements IPedidoService {
 
     @Transactional
     @Override
-    public boolean eliminarPedido(Integer id) {
+    public MensajeDtoResponse eliminarPedido(Integer id) {
         log.info("Service: Solicitud para eliminar lógicamente el pedido con ID: {}", id);
         try {
             if (pedidoRepository.existsById(id)) {
                 pedidoRepository.eliminarPedido(id);
                 log.info("Service: Pedido con ID {} eliminado lógicamente de la BD", id);
-                return true;
+                return new MensajeDtoResponse("Pedido eliminado exitosamente", true);
             }
             log.warn("Service: No se pudo eliminar. Pedido con ID {} no existe", id);
-            return false;
+            return new MensajeDtoResponse("Pedido no encontrado", false);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al eliminar el pedido ID {}", id, e);
-            throw new PedidoServiceException("Error de acceso a la base de datos", e);
+            return new MensajeDtoResponse("Error de acceso a la base de datos al eliminar pedido con id " + id, false);
         } catch (Exception e) {
             log.error("Service: Error inesperado al eliminar el pedido ID {}", id, e);
-            throw new PedidoServiceException("Error inesperado al eliminar pedido con id " + id, e);
+            return new MensajeDtoResponse("Error inesperado al eliminar pedido con id " + id, false);
         }
     }
 
@@ -204,10 +220,10 @@ public class PedidoService implements IPedidoService {
 // QUERYS PERSONALIZADOS
 
     @Override
-    public List<PedidoDtoResponse> buscarPorRangoTotal(Double min, Double max) {
-        log.info("Service: Consultando BD por pedidos con total entre {} y {}", min, max);
+    public List<PedidoDtoResponse> buscarPorRangoTotal(Double rangoMin, Double rangoMax) {
+        log.info("Service: Consultando BD por pedidos con total entre {} y {}", rangoMin, rangoMax);
         try {
-            return pedidoRepository.buscarPorRangoTotal(min, max)
+            return pedidoRepository.buscarPorRangoTotal(rangoMin, rangoMax)
                     .stream()
                     .map(pedido -> {
                         PedidoDtoResponse dto = new PedidoDtoResponse();

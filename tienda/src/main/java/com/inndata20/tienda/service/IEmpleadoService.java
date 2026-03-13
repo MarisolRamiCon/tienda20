@@ -11,18 +11,24 @@ import java.util.List;
 public interface IEmpleadoService {
 
     List<EmpleadoDtoResponse> listarEmpleados();
-     EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoDtoRequest);
 
-    MensajeDtoResponse guardarEmpleado(EmpleadoDtoRequest dto);
-    MensajeDtoResponse actualizarEmpleado(Integer id, EmpleadoDtoRequest dto);
+    EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoDtoRequest);
+
+    MensajeDtoResponse guardarEmpleado(EmpleadoDtoRequest empleadoRequest);
+
+    MensajeDtoResponse actualizarEmpleado(Integer id, EmpleadoDtoRequest empleadoRequest);
+
     boolean eliminarEmpleado(Integer id);
 
     // --- MÉTODOS JPA PERSONALIZADOS ---
     List<EmpleadoDtoResponse> buscarPorPuesto(String puesto);
+
     List<EmpleadoDtoResponse> buscarPorNombre(String nombre);
 
     // QUERYS PERSONALIZADOS
 
-    List<EmpleadoDtoResponse> buscarPorRangoSalario(BigDecimal min, BigDecimal max);
+    // Más explícito
+    List<EmpleadoDtoResponse> buscarPorRangoSalario(BigDecimal salarioMin, BigDecimal salarioMax);
+
     List<EmpleadoDtoResponse> buscarPorFechaContratacion(LocalDate fecha);
 }

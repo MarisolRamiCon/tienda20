@@ -11,9 +11,9 @@ public interface IPedidoService {
 
     List<PedidoDtoResponse> listarPedidos();
     PedidoDtoResponse buscarPorId(Integer id);
-    MensajeDtoResponse guardarPedido(PedidoDtoRequest dto);
-    MensajeDtoResponse actualizarPedido(Integer id, PedidoDtoRequest dto);
-    boolean eliminarPedido(Integer id);
+    MensajeDtoResponse guardarPedido(PedidoDtoRequest pedidoRequest);
+    MensajeDtoResponse actualizarPedido(Integer id, PedidoDtoRequest pedidoRequest);
+    MensajeDtoResponse eliminarPedido(Integer id);
 
     // METODOS JPA PERSONALIZADOS
     List<PedidoDtoResponse> buscarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin);
@@ -21,6 +21,6 @@ public interface IPedidoService {
 
     // QUERYS PERSONALIZADOS
 
-    List<PedidoDtoResponse> buscarPorRangoTotal(Double min, Double max);
+    List<PedidoDtoResponse> buscarPorRangoTotal(Double rangoMin, Double rangoMax);
     List<PedidoDtoResponse> buscarPedidosActivosPorCliente(Integer clienteId);
 }

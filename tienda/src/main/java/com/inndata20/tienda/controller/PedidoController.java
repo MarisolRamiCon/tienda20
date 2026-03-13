@@ -38,26 +38,22 @@ public class PedidoController {
     }
 
     @PostMapping("/guardar")
-    public MensajeDtoResponse guardarPedido(@RequestBody PedidoDtoRequest dto) {
-        log.info("REST Request: Petición para guardar un nuevo pedido del cliente ID: {}", dto.getClienteId());
-        return pedidoService.guardarPedido(dto);
+    public MensajeDtoResponse guardarPedido(@RequestBody PedidoDtoRequest pedidoRequest) {
+        log.info("REST Request: Petición para guardar un nuevo pedido del cliente ID: {}", pedidoRequest.getClienteId());
+        return pedidoService.guardarPedido(pedidoRequest);
     }
 
     @PutMapping("/actualizar/{id}")
-    public MensajeDtoResponse actualizarPedido(@PathVariable Integer id, @RequestBody PedidoDtoRequest dto) {
+    public MensajeDtoResponse actualizarPedido(@PathVariable Integer id, @RequestBody PedidoDtoRequest pedidoRequest) {
         log.info("REST Request: Petición para actualizar el pedido con ID: {}", id);
-        return pedidoService.actualizarPedido(id, dto);
+        return pedidoService.actualizarPedido(id, pedidoRequest);
     }
 
     @DeleteMapping("/eliminar/{id}")
     public MensajeDtoResponse eliminarPedido(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el pedido con ID: {}", id);
-        if (pedidoService.eliminarPedido(id)) {
-            log.info("Pedido con ID: {} eliminado correctamente", id);
-            return new MensajeDtoResponse("Pedido eliminado correctamente", true);
-        }
-        log.warn("REST Request Fallido: No se pudo eliminar, pedido con ID: {} no encontrado", id);
-        return new MensajeDtoResponse("Pedido no encontrado o ya eliminado", false);
+        return pedidoService.eliminarPedido(id);
+
     }
 
     // METODOS JPA PERSONALIZADOS
@@ -80,10 +76,10 @@ public class PedidoController {
 
     @GetMapping("/total")
     public List<PedidoDtoResponse> buscarPorRangoTotal(
-            @RequestParam Double min,
-            @RequestParam Double max) {
-        log.info("REST Request: Buscando pedidos con total entre {} y {}", min, max);
-        return pedidoService.buscarPorRangoTotal(min, max);
+            @RequestParam Double rangoMin,
+            @RequestParam Double rangoMax) {
+        log.info("REST Request: Buscando pedidos con total entre {} y {}", rangoMin, rangoMax);
+        return pedidoService.buscarPorRangoTotal(rangoMin, rangoMax);
     }
 
     @GetMapping("/cliente-activo/{clienteId}")

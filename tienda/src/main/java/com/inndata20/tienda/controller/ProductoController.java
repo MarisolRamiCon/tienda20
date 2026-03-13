@@ -6,7 +6,6 @@ import com.inndata20.tienda.model.ProductoDtoResponse;
 import com.inndata20.tienda.service.IProductoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,26 +36,21 @@ public class ProductoController {
     }
 
     @PostMapping("/guardar")
-    public String guardarProducto(@RequestBody ProductoDtoRequest dto) {
-        log.info("REST Request: Petición para guardar un nuevo producto");
-        return productoService.guardarProducto(dto);
+    public MensajeDtoResponse guardarProducto(@RequestBody ProductoDtoRequest productoRequest) {
+        log.info("REST Request: Petición para guardar un nuevo producto: {}", productoRequest.getNombre());
+        return productoService.guardarProducto(productoRequest);
     }
 
     @PutMapping("/actualizar/{id}")
-    public String actualizarProducto(@PathVariable Integer id, @RequestBody ProductoDtoRequest dto) {
+    public MensajeDtoResponse actualizarProducto(@PathVariable Integer id, @RequestBody ProductoDtoRequest productoRequest) {
         log.info("REST Request: Petición para actualizar el producto con ID: {}", id);
-        return productoService.actualizarProducto(id, dto);
+        return productoService.actualizarProducto(id, productoRequest);
     }
 
     @DeleteMapping("/eliminar/{id}")
     public MensajeDtoResponse eliminarProducto(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el producto con ID: {}", id);
-        if (productoService.eliminarProducto(id)) {
-            log.info("Producto con ID: {} eliminado correctamente", id);
-            return new MensajeDtoResponse("Producto eliminado correctamente",true);
-        }
-        log.warn("REST Request Fallido: No se pudo eliminar, producto con ID: {} no encontrado", id);
-        return new MensajeDtoResponse("Producto no encontrado o ya eliminado", false);
+        return productoService.eliminarProducto(id);
     }
 
     // METODOS JPA PERSONALIZADOS
@@ -93,7 +87,4 @@ public class ProductoController {
         log.info("REST Request: Buscando productos del proveedor con ID: {}", proveedorId);
         return ResponseEntity.ok(productoService.buscarPorProveedor(proveedorId));
     }
-
-    // GET /api/v1/productos/buscar/nombre-categoria?nombre=camisa&categoria=ropa
-    //GET /api/v1/productos/buscar/proveedor/1
 }

@@ -48,9 +48,9 @@ public class EmpleadoController {
     }
 
     @PutMapping("/actualizar/{id}")
-    public ResponseEntity<MensajeDtoResponse> actualizarEmpleado(@PathVariable Integer id, @RequestBody EmpleadoDtoRequest empleado) {
+    public ResponseEntity<MensajeDtoResponse> actualizarEmpleado(@PathVariable Integer id, @RequestBody EmpleadoDtoRequest empleadoRequest) {
         log.info("REST Request: Petición para actualizar el empleado con ID: {}", id);
-        MensajeDtoResponse respuesta = empleadoService.actualizarEmpleado(id, empleado);
+        MensajeDtoResponse respuesta = empleadoService.actualizarEmpleado(id, empleadoRequest);
         return ResponseEntity.ok(respuesta);
     }
 
@@ -83,10 +83,10 @@ public class EmpleadoController {
 
     @GetMapping("/salario")
     public List<EmpleadoDtoResponse> buscarPorRangoSalario(
-            @RequestParam BigDecimal min,
-            @RequestParam BigDecimal max) {
-        log.info("REST Request: Buscando empleados con salario entre {} y {}", min, max);
-        return empleadoService.buscarPorRangoSalario(min, max);
+            @RequestParam BigDecimal salarioMin,
+            @RequestParam BigDecimal salarioMax) {
+        log.info("REST Request: Buscando empleados con salario entre {} y {}", salarioMin, salarioMax);
+        return empleadoService.buscarPorRangoSalario(salarioMin,salarioMax);
     }
 
     @GetMapping("/fecha-contratacion")
