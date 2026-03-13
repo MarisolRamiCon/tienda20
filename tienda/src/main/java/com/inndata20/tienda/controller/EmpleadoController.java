@@ -6,6 +6,7 @@ import com.inndata20.tienda.model.MensajeDtoResponse;
 import com.inndata20.tienda.service.IEmpleadoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,68 +26,124 @@ public class EmpleadoController {
         this.empleadoService = empleadoService;
     }
 
-    @GetMapping("/listar")
-    public List<EmpleadoDtoResponse> listarEmpleados() {
+    // GET a /api/v1/empleados (quitamos el /listar)
+    @GetMapping
+    public ResponseEntity<?> listarEmpleados() {
         log.info("REST Request: Solicitando la lista de todos los empleados");
-        return empleadoService.listarEmpleados();
+        List<EmpleadoDtoResponse> empleados = empleadoService.listarEmpleados();
+
+        if (empleados.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron empleados activos", false));
+        }
+        return ResponseEntity.ok(empleados);
     }
 
-    @GetMapping("/buscar/{id}")
-    public EmpleadoDtoResponse buscarPorId(@PathVariable Integer id) {
+    // GET a /api/v1/empleados/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando empleado con ID: {}", id);
-        EmpleadoDtoRequest empleadoRequest = new EmpleadoDtoRequest();
-        empleadoRequest.setId(id);
-        return empleadoService.buscarPorId(empleadoRequest);
+        EmpleadoDtoResponse empleado = empleadoService.buscarPorId(id);
+
+        if (empleado == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("Empleado con ID " + id + " no encontrado", false));
+        }
+        return ResponseEntity.ok(empleado);
     }
 
-    @PostMapping("/guardar")
+    // POST a /api/v1/empleados (quitamos el /guardar)
+    @PostMapping
     public ResponseEntity<MensajeDtoResponse> guardarEmpleado(@RequestBody EmpleadoDtoRequest empleadoRequest) {
         log.info("REST Request: Petición para guardar un nuevo empleado: {}", empleadoRequest.getNombre());
         MensajeDtoResponse respuesta = empleadoService.guardarEmpleado(empleadoRequest);
-        return ResponseEntity.ok(respuesta);
+
+        if (respuesta.getExito()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(respuesta); // 201 Created
+        }
+        return ResponseEntity.badRequest().body(respuesta); // 400 Bad Request
     }
 
-    @PutMapping("/actualizar/{id}")
+    // PUT a /api/v1/empleados/{id} (quitamos el /actualizar)
+    @PutMapping("/{id}")
     public ResponseEntity<MensajeDtoResponse> actualizarEmpleado(@PathVariable Integer id, @RequestBody EmpleadoDtoRequest empleadoRequest) {
         log.info("REST Request: Petición para actualizar el empleado con ID: {}", id);
         MensajeDtoResponse respuesta = empleadoService.actualizarEmpleado(id, empleadoRequest);
-        return ResponseEntity.ok(respuesta);
+
+        if (respuesta.getExito()) {
+            return ResponseEntity.ok(respuesta); // 200 OK
+        }
+        return ResponseEntity.badRequest().body(respuesta); // 400 Bad Request
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public MensajeDtoResponse eliminarEmpleado(@PathVariable Integer id) {
+    // DELETE a /api/v1/empleados/{id} (quitamos el /eliminar)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MensajeDtoResponse> eliminarEmpleado(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el empleado con ID: {}", id);
-        return empleadoService.eliminarEmpleado(id);
+        MensajeDtoResponse respuesta = empleadoService.eliminarEmpleado(id);
+
+        if (respuesta.getExito()) {
+            return ResponseEntity.ok(respuesta); // 200 OK
+        }
+        return ResponseEntity.badRequest().body(respuesta); // 400 Bad Request
     }
 
+    // ==========================================
     // JPA PERSONALIZADOS
+    // ==========================================
 
     @GetMapping("/puesto/{puesto}")
-    public List<EmpleadoDtoResponse> buscarPorPuesto(@PathVariable String puesto) {
+    public ResponseEntity<?> buscarPorPuesto(@PathVariable String puesto) {
         log.info("REST Request: Buscando empleados con puesto '{}'", puesto);
-        return empleadoService.buscarPorPuesto(puesto);
+        List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorPuesto(puesto);
+
+        if (empleados.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron empleados con el puesto: " + puesto, false));
+        }
+        return ResponseEntity.ok(empleados);
     }
 
     @GetMapping("/nombre/{nombre}")
-    public List<EmpleadoDtoResponse> buscarPorNombre(@PathVariable String nombre) {
+    public ResponseEntity<?> buscarPorNombre(@PathVariable String nombre) {
         log.info("REST Request: Buscando empleados con nombre que contenga '{}'", nombre);
-        return empleadoService.buscarPorNombre(nombre);
+        List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorNombre(nombre);
+
+        if (empleados.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron empleados con el nombre: " + nombre, false));
+        }
+        return ResponseEntity.ok(empleados);
     }
 
+    // ==========================================
     // QUERYS PERSONALIZADOS
+    // ==========================================
 
     @GetMapping("/salario")
-    public List<EmpleadoDtoResponse> buscarPorRangoSalario(
+    public ResponseEntity<?> buscarPorRangoSalario(
             @RequestParam BigDecimal salarioMin,
             @RequestParam BigDecimal salarioMax) {
         log.info("REST Request: Buscando empleados con salario entre {} y {}", salarioMin, salarioMax);
-        return empleadoService.buscarPorRangoSalario(salarioMin, salarioMax);
+        List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorRangoSalario(salarioMin, salarioMax);
+
+        if (empleados.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron empleados en ese rango de salario", false));
+        }
+        return ResponseEntity.ok(empleados);
     }
 
     @GetMapping("/fecha-contratacion")
-    public List<EmpleadoDtoResponse> buscarPorFechaContratacion(
+    public ResponseEntity<?> buscarPorFechaContratacion(
             @RequestParam LocalDate fecha) {
         log.info("REST Request: Buscando empleados contratados a partir de {}", fecha);
-        return empleadoService.buscarPorFechaContratacion(fecha);
+        List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorFechaContratacion(fecha);
+
+        if (empleados.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensajeDtoResponse("No se encontraron empleados contratados a partir de esa fecha", false));
+        }
+        return ResponseEntity.ok(empleados);
     }
 }

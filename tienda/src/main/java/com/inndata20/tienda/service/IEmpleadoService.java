@@ -12,7 +12,8 @@ public interface IEmpleadoService {
 
     List<EmpleadoDtoResponse> listarEmpleados();
 
-    EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoDtoRequest);
+    // 👇 AQUÍ ESTÁ EL CAMBIO QUE QUITA EL ERROR 👇
+    EmpleadoDtoResponse buscarPorId(Integer id);
 
     MensajeDtoResponse guardarEmpleado(EmpleadoDtoRequest empleadoRequest);
 
@@ -25,9 +26,7 @@ public interface IEmpleadoService {
 
     List<EmpleadoDtoResponse> buscarPorNombre(String nombre);
 
-    // QUERYS PERSONALIZADOS
-
-    // Más explícito
+    // --- QUERYS PERSONALIZADOS ---
     List<EmpleadoDtoResponse> buscarPorRangoSalario(BigDecimal salarioMin, BigDecimal salarioMax);
 
     List<EmpleadoDtoResponse> buscarPorFechaContratacion(LocalDate fecha);

@@ -41,10 +41,10 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al consultar productos", e);
-            throw new ProductoServiceException("Error de base de datos al listar productos", e);
+            return List.of(); // Cambiamos throw por lista vacía
         } catch (Exception e) {
             log.error("Service: Error inesperado al consultar productos", e);
-            throw new ProductoServiceException("Error inesperado al listar productos", e);
+            return List.of(); // Cambiamos throw por lista vacía
         }
     }
 
@@ -65,10 +65,10 @@ public class ProductoService implements IProductoService {
             return response;
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar producto con ID {}", id, e);
-            throw new ProductoServiceException("Error de base de datos al buscar producto por ID", e);
+            return null; // Cambiamos throw por null
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar producto con ID {}", id, e);
-            throw new ProductoServiceException("Error inesperado al buscar producto por ID", e);
+            return null; // Cambiamos throw por null
         }
     }
 
@@ -98,10 +98,10 @@ public class ProductoService implements IProductoService {
 
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar guardar el producto {}", productoRequest.getNombre(), e);
-            throw new ProductoServiceException("Error de base de datos al guardar producto", e);
+            return new MensajeDtoResponse("Error de base de datos al guardar producto", false);
         } catch (Exception e) {
             log.error("Service: Error inesperado al intentar guardar el producto {}", productoRequest.getNombre(), e);
-            throw new ProductoServiceException("Error inesperado al guardar producto", e);
+            return new MensajeDtoResponse("Error inesperado al guardar producto", false);
         }
     }
 
@@ -135,10 +135,10 @@ public class ProductoService implements IProductoService {
 
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar actualizar el producto ID {}", id, e);
-            throw new ProductoServiceException("Error de base de datos al actualizar producto", e);
+            return new MensajeDtoResponse("Error de base de datos al actualizar producto", false);
         } catch (Exception e) {
             log.error("Service: Error inesperado al actualizar el producto ID {}", id, e);
-            throw new ProductoServiceException("Error inesperado al actualizar producto", e);
+            return new MensajeDtoResponse("Error inesperado al actualizar producto", false);
         }
     }
 
@@ -156,10 +156,10 @@ public class ProductoService implements IProductoService {
             return new MensajeDtoResponse("Producto no encontrado", false);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al eliminar el producto ID {}", id, e);
-            throw new ProductoServiceException("Error de base de datos al eliminar producto", e);
+            return new MensajeDtoResponse("Error de base de datos al eliminar producto", false);
         } catch (Exception e) {
             log.error("Service: Error inesperado al eliminar el producto ID {}", id, e);
-            throw new ProductoServiceException("Error inesperado al eliminar producto", e);
+            return new MensajeDtoResponse("Error inesperado al eliminar producto", false);
         }
     }
 
@@ -176,10 +176,10 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por categoría '{}' y precio", categoria, e);
-            throw new ProductoServiceException("Error de base de datos al buscar por categoría y precio", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por categoría '{}' y precio", categoria, e);
-            throw new ProductoServiceException("Error inesperado al buscar por categoría y precio", e);
+            return List.of();
         }
     }
 
@@ -194,10 +194,10 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por stock entre {} y {}", stockMin, stockMax, e);
-            throw new ProductoServiceException("Error de base de datos al buscar por stock", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por stock entre {} y {}", stockMin, stockMax, e);
-            throw new ProductoServiceException("Error inesperado al buscar por stock", e);
+            return List.of();
         }
     }
 
@@ -213,10 +213,10 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por nombre '{}' y categoría '{}'", nombre, categoria, e);
-            throw new ProductoServiceException("Error de base de datos al buscar por nombre y categoría", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por nombre '{}' y categoría '{}'", nombre, categoria, e);
-            throw new ProductoServiceException("Error inesperado al buscar por nombre y categoría", e);
+            return List.of();
         }
     }
 
@@ -230,12 +230,29 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por proveedor ID: {}", proveedorId, e);
-            throw new ProductoServiceException("Error de base de datos al buscar por proveedor", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por proveedor ID: {}", proveedorId, e);
-            throw new ProductoServiceException("Error inesperado al buscar por proveedor", e);
+            return List.of();
         }
     }
 
     // --- METODO AUXILIAR PARA NO REPETIR CÓDIGO ---
-    private ProductoDtoResponse mapearADto
+    private ProductoDtoResponse mapearADto(ProductoEntity producto) {
+        ProductoDtoResponse productoResponse = new ProductoDtoResponse();
+
+        
+        productoResponse.setNombre(producto.getNombre());
+        productoResponse.setDescripcion(producto.getDescripcion());
+        productoResponse.setPrecio(producto.getPrecio());
+        productoResponse.setCategoria(producto.getCategoria());
+        productoResponse.setStock(producto.getStock());
+
+        // Evitamos un NullPointerException si por alguna razón el proveedor viene nulo
+        if (producto.getProveedor() != null) {
+            productoResponse.setProveedor(producto.getProveedor().getId());
+        }
+
+        return productoResponse;
+    }
+}

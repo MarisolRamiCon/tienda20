@@ -41,10 +41,10 @@ public class PedidoService implements IPedidoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al consultar pedidos", e);
-            throw new PedidoServiceException("Error de base de datos al listar pedidos", e);
+            return List.of(); // Devolvemos lista vacía en lugar de throw
         } catch (Exception e) {
             log.error("Service: Error inesperado al consultar pedidos", e);
-            throw new PedidoServiceException("Error inesperado al listar pedidos", e);
+            return List.of(); // Devolvemos lista vacía en lugar de throw
         }
     }
 
@@ -65,10 +65,10 @@ public class PedidoService implements IPedidoService {
             return response;
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar pedido con ID {}", id, e);
-            throw new PedidoServiceException("Error de base de datos al buscar pedido por ID", e);
+            return null; // Devolvemos null en lugar de throw
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar pedido con ID {}", id, e);
-            throw new PedidoServiceException("Error inesperado al buscar pedido por ID", e);
+            return null; // Devolvemos null en lugar de throw
         }
     }
 
@@ -93,10 +93,10 @@ public class PedidoService implements IPedidoService {
             return new MensajeDtoResponse("Pedido guardado exitosamente", true);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar guardar el pedido", e);
-            throw new PedidoServiceException("Error de acceso a la base de datos al guardar pedido", e);
+            return new MensajeDtoResponse("Error de acceso a la base de datos al guardar pedido", false); // Devolvemos mensaje en lugar de throw
         } catch (Exception e) {
             log.error("Service: Error inesperado al intentar guardar el pedido", e);
-            throw new PedidoServiceException("Error inesperado al guardar pedido", e);
+            return new MensajeDtoResponse("Error inesperado al guardar pedido", false); // Devolvemos mensaje en lugar de throw
         }
     }
 
@@ -127,10 +127,10 @@ public class PedidoService implements IPedidoService {
 
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar actualizar el pedido ID {}", id, e);
-            throw new PedidoServiceException("Error de acceso a la base de datos al actualizar pedido", e);
+            return new MensajeDtoResponse("Error de acceso a la base de datos al actualizar pedido", false);
         } catch (Exception e) {
             log.error("Service: Error inesperado al actualizar el pedido ID {}", id, e);
-            throw new PedidoServiceException("Error inesperado al actualizar pedido", e);
+            return new MensajeDtoResponse("Error inesperado al actualizar pedido", false);
         }
     }
 
@@ -140,7 +140,7 @@ public class PedidoService implements IPedidoService {
         log.info("Service: Solicitud para eliminar lógicamente el pedido con ID: {}", id);
         try {
             if (pedidoRepository.existsById(id)) {
-                pedidoRepository.eliminarPedido(id); // Asumo que este método hace un UPDATE para cambiar el estado a inactivo
+                pedidoRepository.eliminarPedido(id); // Asumo que este metodo hace un UPDATE para cambiar el estado a inactivo
                 log.info("Service: Pedido con ID {} eliminado lógicamente de la BD", id);
                 return new MensajeDtoResponse("Pedido eliminado exitosamente", true);
             }
@@ -148,10 +148,10 @@ public class PedidoService implements IPedidoService {
             return new MensajeDtoResponse("Pedido no encontrado", false);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al eliminar el pedido ID {}", id, e);
-            throw new PedidoServiceException("Error de acceso a la base de datos al eliminar pedido", e);
+            return new MensajeDtoResponse("Error de acceso a la base de datos al eliminar pedido", false);
         } catch (Exception e) {
             log.error("Service: Error inesperado al eliminar el pedido ID {}", id, e);
-            throw new PedidoServiceException("Error inesperado al eliminar pedido", e);
+            return new MensajeDtoResponse("Error inesperado al eliminar pedido", false);
         }
     }
 
@@ -168,10 +168,10 @@ public class PedidoService implements IPedidoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por rango de fechas", e);
-            throw new PedidoServiceException("Error de base de datos al buscar por rango de fechas", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por rango de fechas", e);
-            throw new PedidoServiceException("Error inesperado al buscar por rango de fechas", e);
+            return List.of();
         }
     }
 
@@ -186,10 +186,10 @@ public class PedidoService implements IPedidoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por cliente ID: {}", clienteId, e);
-            throw new PedidoServiceException("Error de base de datos al buscar por cliente", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por cliente ID: {}", clienteId, e);
-            throw new PedidoServiceException("Error inesperado al buscar por cliente", e);
+            return List.of();
         }
     }
 
@@ -205,10 +205,10 @@ public class PedidoService implements IPedidoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por rango de total", e);
-            throw new PedidoServiceException("Error de base de datos al buscar por rango de total", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por rango de total", e);
-            throw new PedidoServiceException("Error inesperado al buscar por rango de total", e);
+            return List.of();
         }
     }
 
@@ -222,10 +222,10 @@ public class PedidoService implements IPedidoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar pedidos activos del cliente ID: {}", clienteId, e);
-            throw new PedidoServiceException("Error de base de datos al buscar pedidos activos", e);
+            return List.of();
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar pedidos activos del cliente ID: {}", clienteId, e);
-            throw new PedidoServiceException("Error inesperado al buscar pedidos activos", e);
+            return List.of();
         }
     }
 
@@ -233,19 +233,10 @@ public class PedidoService implements IPedidoService {
     // METODO PRIVADO DE APOYO (HELPER)
     // =======================================================
     private PedidoDtoResponse convertirADto(PedidoEntity pedido) {
-        PedidoDtoResponse dto = new PedidoDtoResponse();
-        dto.setFechaPedido(pedido.getFechaPedido());
-        dto.setTotal(pedido.getTotal());
-        dto.setClienteId(pedido.getCliente().getId());
-        return dto;
-    }
-
-    // =======================================================
-    // EXCEPCIÓN PERSONALIZADA
-    // =======================================================
-    public class PedidoServiceException extends RuntimeException {
-        public PedidoServiceException(String message, Throwable cause) {
-            super(message, cause);
-        }
+        PedidoDtoResponse pedidoResponse = new PedidoDtoResponse(); // Nombre explícito en lugar de "dto"
+        pedidoResponse.setFechaPedido(pedido.getFechaPedido());
+        pedidoResponse.setTotal(pedido.getTotal());
+        pedidoResponse.setClienteId(pedido.getCliente().getId());
+        return pedidoResponse;
     }
 }
