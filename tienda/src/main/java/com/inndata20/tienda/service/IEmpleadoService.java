@@ -13,7 +13,7 @@ public interface IEmpleadoService {
     List<EmpleadoDtoResponse> listarEmpleados();
 
     // 👇 AQUÍ ESTÁ EL CAMBIO QUE QUITA EL ERROR 👇
-    EmpleadoDtoResponse buscarPorId(Integer id);
+    EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoRequest);
 
     MensajeDtoResponse guardarEmpleado(EmpleadoDtoRequest empleadoRequest);
 

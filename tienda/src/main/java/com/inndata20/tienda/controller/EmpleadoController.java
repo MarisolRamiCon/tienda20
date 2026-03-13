@@ -28,7 +28,7 @@ public class EmpleadoController {
 
     // GET a /api/v1/empleados (quitamos el /listar)
     @GetMapping
-    public ResponseEntity<?> listarEmpleados() {
+    public ResponseEntity<Object> listarEmpleados() {
         log.info("REST Request: Solicitando la lista de todos los empleados");
         List<EmpleadoDtoResponse> empleados = empleadoService.listarEmpleados();
 
@@ -39,11 +39,13 @@ public class EmpleadoController {
         return ResponseEntity.ok(empleados);
     }
 
-    // GET a /api/v1/empleados/{id}
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<Object> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando empleado con ID: {}", id);
-        EmpleadoDtoResponse empleado = empleadoService.buscarPorId(id);
+        EmpleadoDtoRequest empleadoRequest = new EmpleadoDtoRequest();
+        empleadoRequest.setId(id);
+        EmpleadoDtoResponse empleado = empleadoService.buscarPorId(empleadoRequest);
 
         if (empleado == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -58,7 +60,7 @@ public class EmpleadoController {
         log.info("REST Request: Petición para guardar un nuevo empleado: {}", empleadoRequest.getNombre());
         MensajeDtoResponse respuesta = empleadoService.guardarEmpleado(empleadoRequest);
 
-        if (respuesta.getExito()) {
+        if (Boolean.TRUE.equals(respuesta.getExito())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(respuesta); // 201 Created
         }
         return ResponseEntity.badRequest().body(respuesta); // 400 Bad Request
@@ -70,7 +72,7 @@ public class EmpleadoController {
         log.info("REST Request: Petición para actualizar el empleado con ID: {}", id);
         MensajeDtoResponse respuesta = empleadoService.actualizarEmpleado(id, empleadoRequest);
 
-        if (respuesta.getExito()) {
+        if (Boolean.TRUE.equals(respuesta.getExito())) {
             return ResponseEntity.ok(respuesta); // 200 OK
         }
         return ResponseEntity.badRequest().body(respuesta); // 400 Bad Request
@@ -82,7 +84,7 @@ public class EmpleadoController {
         log.info("REST Request: Petición para eliminar lógicamente el empleado con ID: {}", id);
         MensajeDtoResponse respuesta = empleadoService.eliminarEmpleado(id);
 
-        if (respuesta.getExito()) {
+        if (Boolean.TRUE.equals(respuesta.getExito())) {
             return ResponseEntity.ok(respuesta); // 200 OK
         }
         return ResponseEntity.badRequest().body(respuesta); // 400 Bad Request
@@ -93,7 +95,7 @@ public class EmpleadoController {
     // ==========================================
 
     @GetMapping("/puesto/{puesto}")
-    public ResponseEntity<?> buscarPorPuesto(@PathVariable String puesto) {
+    public ResponseEntity<Object> buscarPorPuesto(@PathVariable String puesto) {
         log.info("REST Request: Buscando empleados con puesto '{}'", puesto);
         List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorPuesto(puesto);
 
@@ -105,7 +107,7 @@ public class EmpleadoController {
     }
 
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<?> buscarPorNombre(@PathVariable String nombre) {
+    public ResponseEntity<Object> buscarPorNombre(@PathVariable String nombre) {
         log.info("REST Request: Buscando empleados con nombre que contenga '{}'", nombre);
         List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorNombre(nombre);
 
@@ -121,7 +123,7 @@ public class EmpleadoController {
     // ==========================================
 
     @GetMapping("/salario")
-    public ResponseEntity<?> buscarPorRangoSalario(
+    public ResponseEntity<Object> buscarPorRangoSalario(
             @RequestParam BigDecimal salarioMin,
             @RequestParam BigDecimal salarioMax) {
         log.info("REST Request: Buscando empleados con salario entre {} y {}", salarioMin, salarioMax);
@@ -135,7 +137,7 @@ public class EmpleadoController {
     }
 
     @GetMapping("/fecha-contratacion")
-    public ResponseEntity<?> buscarPorFechaContratacion(
+    public ResponseEntity<Object> buscarPorFechaContratacion(
             @RequestParam LocalDate fecha) {
         log.info("REST Request: Buscando empleados contratados a partir de {}", fecha);
         List<EmpleadoDtoResponse> empleados = empleadoService.buscarPorFechaContratacion(fecha);
