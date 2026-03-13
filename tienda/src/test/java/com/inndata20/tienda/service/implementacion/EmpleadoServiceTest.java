@@ -75,7 +75,7 @@ class EmpleadoServiceTest {
         EmpleadoEntity empleado = empleadoEntity(1, "Juan", "Perez", "Cajero", true);
         when(empleadoRepository.findById(1)).thenReturn(Optional.of(empleado));
 
-        EmpleadoDtoResponse resultado = empleadoService.buscarPorId(1);
+        EmpleadoDtoResponse resultado = empleadoService.buscarPorId(empleadoDtoRequestConId(1));
 
         assertNotNull(resultado);
         assertEquals(1, resultado.getId());
@@ -85,17 +85,17 @@ class EmpleadoServiceTest {
     @Test
     void buscarPorId_cuandoNoExiste_o_inactivo_devuelveNull() {
         when(empleadoRepository.findById(1)).thenReturn(Optional.empty());
-        assertNull(empleadoService.buscarPorId(1));
+        assertNull(empleadoService.buscarPorId(empleadoDtoRequestConId(1)));
 
         EmpleadoEntity inactivo = empleadoEntity(2, "Ana", "Lopez", "Gerente", false);
         when(empleadoRepository.findById(2)).thenReturn(Optional.of(inactivo));
-        assertNull(empleadoService.buscarPorId(2));
+        assertNull(empleadoService.buscarPorId(empleadoDtoRequestConId(2)));
     }
 
     @Test
     void buscarPorId_siRepositorioFalla_devuelveNull() {
         when(empleadoRepository.findById(1)).thenThrow(new DataAccessResourceFailureException("db down"));
-        assertNull(empleadoService.buscarPorId(1));
+        assertNull(empleadoService.buscarPorId(empleadoDtoRequestConId(1)));
     }
 
     @Test
@@ -289,7 +289,7 @@ class EmpleadoServiceTest {
     @Test
     void cubreCatchFaltantes_enEmpleadoService() {
         when(empleadoRepository.findById(1)).thenThrow(new RuntimeException("boom"));
-        assertNull(empleadoService.buscarPorId(1));
+        assertNull(empleadoService.buscarPorId(empleadoDtoRequestConId(1)));
 
         reset(empleadoRepository);
         EmpleadoEntity existente = empleadoEntity(1, "Juan", "Perez", "Cajero", true);
@@ -391,5 +391,11 @@ class EmpleadoServiceTest {
         e.setPuesto(puesto);
         e.setActivo(activo);
         return e;
+    }
+
+    private static EmpleadoDtoRequest empleadoDtoRequestConId(Integer id) {
+        EmpleadoDtoRequest req = new EmpleadoDtoRequest();
+        req.setId(id);
+        return req;
     }
 }
