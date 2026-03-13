@@ -58,6 +58,19 @@ class EmpleadoServiceTest {
     }
 
     @Test
+    void listarEmpleados_siOcurreExcepcionInesperada_devuelveListaVacia() {
+        EmpleadoEntity activoConNpe = empleadoEntity(1, "Juan", "Perez", "Cajero", true);
+        // Fuerza NPE por autounboxing en el filter(EmpleadoEntity::getActivo)
+        activoConNpe.setActivo(null);
+        when(empleadoRepository.findAll()).thenReturn(List.of(activoConNpe));
+
+        List<EmpleadoDtoResponse> resultado = empleadoService.listarEmpleados();
+
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+    }
+
+    @Test
     void buscarPorId_cuandoExisteYActivo_devuelveDto() {
         EmpleadoEntity empleado = empleadoEntity(1, "Juan", "Perez", "Cajero", true);
         when(empleadoRepository.findById(1)).thenReturn(Optional.of(empleado));
@@ -77,6 +90,12 @@ class EmpleadoServiceTest {
         EmpleadoEntity inactivo = empleadoEntity(2, "Ana", "Lopez", "Gerente", false);
         when(empleadoRepository.findById(2)).thenReturn(Optional.of(inactivo));
         assertNull(empleadoService.buscarPorId(2));
+    }
+
+    @Test
+    void buscarPorId_siRepositorioFalla_devuelveNull() {
+        when(empleadoRepository.findById(1)).thenThrow(new DataAccessResourceFailureException("db down"));
+        assertNull(empleadoService.buscarPorId(1));
     }
 
     @Test
@@ -119,6 +138,20 @@ class EmpleadoServiceTest {
         assertNotNull(resp);
         assertFalse(resp.getExito());
         assertEquals("Error de base de datos al guardar empleado", resp.getMensaje());
+    }
+
+    @Test
+    void guardarEmpleado_siOcurreExcepcionInesperada_devuelveError() {
+        EmpleadoDtoRequest req = new EmpleadoDtoRequest();
+        req.setNombre("Juan");
+
+        when(empleadoRepository.save(any(EmpleadoEntity.class))).thenThrow(new RuntimeException("boom"));
+
+        MensajeDtoResponse resp = empleadoService.guardarEmpleado(req);
+
+        assertNotNull(resp);
+        assertFalse(resp.getExito());
+        assertEquals("Error inesperado al guardar empleado", resp.getMensaje());
     }
 
     @Test
@@ -173,6 +206,22 @@ class EmpleadoServiceTest {
     }
 
     @Test
+    void actualizarEmpleado_siRepositorioFalla_devuelveError() {
+        EmpleadoEntity existente = empleadoEntity(1, "Juan", "Perez", "Cajero", true);
+        when(empleadoRepository.findById(1)).thenReturn(Optional.of(existente));
+        when(empleadoRepository.save(existente)).thenThrow(new DataAccessResourceFailureException("db down"));
+
+        EmpleadoDtoRequest req = new EmpleadoDtoRequest();
+        req.setNombre("Pedro");
+
+        MensajeDtoResponse resp = empleadoService.actualizarEmpleado(1, req);
+
+        assertNotNull(resp);
+        assertFalse(resp.getExito());
+        assertEquals("Error de base de datos al actualizar empleado", resp.getMensaje());
+    }
+
+    @Test
     void eliminarEmpleado_cuandoExiste_eliminaLogico_y_devuelveExito() {
         when(empleadoRepository.existsById(1)).thenReturn(true);
 
@@ -194,6 +243,81 @@ class EmpleadoServiceTest {
         assertFalse(resp.getExito());
         assertEquals("Empleado no encontrado", resp.getMensaje());
         verify(empleadoRepository, never()).eliminarEmpleado(anyInt());
+    }
+
+    @Test
+    void eliminarEmpleado_siRepositorioFalla_devuelveError() {
+        when(empleadoRepository.existsById(1)).thenThrow(new DataAccessResourceFailureException("db down"));
+
+        MensajeDtoResponse resp = empleadoService.eliminarEmpleado(1);
+
+        assertNotNull(resp);
+        assertFalse(resp.getExito());
+        assertEquals("Error de base de datos al eliminar empleado", resp.getMensaje());
+    }
+
+    @Test
+    void eliminarEmpleado_siOcurreExcepcionInesperada_devuelveError() {
+        when(empleadoRepository.existsById(1)).thenThrow(new RuntimeException("boom"));
+
+        MensajeDtoResponse resp = empleadoService.eliminarEmpleado(1);
+
+        assertNotNull(resp);
+        assertFalse(resp.getExito());
+        assertEquals("Error inesperado al eliminar empleado", resp.getMensaje());
+    }
+
+    @Test
+    void consultasPersonalizadas_siRepositorioFalla_devuelvenListasVacias() {
+        when(empleadoRepository.findByPuesto("Cajero")).thenThrow(new DataAccessResourceFailureException("db down"));
+        assertTrue(empleadoService.buscarPorPuesto("Cajero").isEmpty());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.findByNombreContainingIgnoreCase("juan")).thenThrow(new RuntimeException("boom"));
+        assertTrue(empleadoService.buscarPorNombre("juan").isEmpty());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.buscarPorRangoSalario(new BigDecimal("1.00"), new BigDecimal("2.00")))
+                .thenThrow(new DataAccessResourceFailureException("db down"));
+        assertTrue(empleadoService.buscarPorRangoSalario(new BigDecimal("1.00"), new BigDecimal("2.00")).isEmpty());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.buscarPorFechaContratacion(LocalDate.of(2026, 1, 1))).thenThrow(new RuntimeException("boom"));
+        assertTrue(empleadoService.buscarPorFechaContratacion(LocalDate.of(2026, 1, 1)).isEmpty());
+    }
+
+    @Test
+    void cubreCatchFaltantes_enEmpleadoService() {
+        when(empleadoRepository.findById(1)).thenThrow(new RuntimeException("boom"));
+        assertNull(empleadoService.buscarPorId(1));
+
+        reset(empleadoRepository);
+        EmpleadoEntity existente = empleadoEntity(1, "Juan", "Perez", "Cajero", true);
+        when(empleadoRepository.findById(1)).thenReturn(Optional.of(existente));
+        when(empleadoRepository.save(existente)).thenThrow(new RuntimeException("boom"));
+        MensajeDtoResponse respAct = empleadoService.actualizarEmpleado(1, new EmpleadoDtoRequest());
+        assertNotNull(respAct);
+        assertFalse(respAct.getExito());
+        assertEquals("Error inesperado al actualizar empleado", respAct.getMensaje());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.findByPuesto("Cajero")).thenThrow(new RuntimeException("boom"));
+        assertTrue(empleadoService.buscarPorPuesto("Cajero").isEmpty());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.findByNombreContainingIgnoreCase("juan"))
+                .thenThrow(new DataAccessResourceFailureException("db down"));
+        assertTrue(empleadoService.buscarPorNombre("juan").isEmpty());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.buscarPorRangoSalario(new BigDecimal("1.00"), new BigDecimal("2.00")))
+                .thenThrow(new RuntimeException("boom"));
+        assertTrue(empleadoService.buscarPorRangoSalario(new BigDecimal("1.00"), new BigDecimal("2.00")).isEmpty());
+
+        reset(empleadoRepository);
+        when(empleadoRepository.buscarPorFechaContratacion(LocalDate.of(2026, 1, 1)))
+                .thenThrow(new DataAccessResourceFailureException("db down"));
+        assertTrue(empleadoService.buscarPorFechaContratacion(LocalDate.of(2026, 1, 1)).isEmpty());
     }
 
     @Test
@@ -269,4 +393,3 @@ class EmpleadoServiceTest {
         return e;
     }
 }
-
