@@ -81,6 +81,7 @@ public class ClienteService implements IClienteService {
                 clienteRepository.save(nuevoCliente);
                 return new MensajeStrResponse("Cliente registrado exitosamente");
             } catch (Exception e) {
+                //TODO: Dejar log aqui.
                 return new MensajeStrResponse(e.getMessage());
             }
         } else  {
@@ -91,7 +92,14 @@ public class ClienteService implements IClienteService {
     @Override
     public MensajeStrResponse updateById(int id, ClienteDtoRequest entrada){
         log.info("Solicitando la modificación del cliente por id: {id}");
-        Optional<ClienteEntity> solicitud = clienteRepository.findById(id);
+        Optional<ClienteEntity> solicitud;
+        try {
+            log.info("Buscando el cliente por id: {id}");
+            solicitud = clienteRepository.findById(id);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new EntityNotFoundException(e);
+        }
         if (solicitud.isPresent()) {
             ClienteEntity cliente = solicitud.get();
 
@@ -115,7 +123,7 @@ public class ClienteService implements IClienteService {
     @Override
     public MensajeStrResponse deleteById(int id){
         log.info("Solicitando la eliminación del cliente por id: {id}");
-        Optional<ClienteEntity> solicitud = clienteRepository.findById(id);
+        Optional<ClienteEntity> solicitud = clienteRepository.findById(id);// TODO: Agregar Try catch
         if (solicitud.isPresent()) {
             ClienteEntity cliente = solicitud.get();
             cliente.setActivo(false);
@@ -127,7 +135,7 @@ public class ClienteService implements IClienteService {
     }
 
     public List<ClienteDtoResponse> searchByName(String busqueda){
-        return clienteRepository.searchByNombre(busqueda).stream().map(cliente ->
+        return clienteRepository.searchByNombre(busqueda).stream().map(cliente -> //TODO: Agregar Try catch
                 new ClienteDtoResponse(
                         cliente.getId(),
                         cliente.getNombre(),

@@ -68,4 +68,35 @@ class ClienteServiceTest {
         assertEquals("Cliente registrado exitosamente",salida.getMensaje());
 
     }
+
+    @Test
+    void update() {
+        Mockito.when(clienteRepository.findById(1)).thenReturn(Optional.of(cliente1));
+        Mockito.when(clienteRepository.save(Mockito.any(ClienteEntity.class))).thenReturn(cliente1);
+        ClienteDtoRequest clienteActualizado = new ClienteDtoRequest();
+        clienteActualizado.setNombre("Epsilon");
+        clienteActualizado.setApellido("Sigma");
+        clienteActualizado.setDireccion("Porai");
+        clienteActualizado.setTelefono("1234567890");
+        MensajeStrResponse salida = clienteService.updateById(1,clienteActualizado);
+        assertEquals("Cliente registrado exitosamente",salida.getMensaje());
+    }
+
+    @Test
+    void delete() {
+        Mockito.when(clienteRepository.findById(1)).thenReturn(Optional.of(cliente1));
+        Mockito.when(clienteRepository.save(Mockito.any(ClienteEntity.class))).thenReturn(cliente1);
+        MensajeStrResponse salida = clienteService.deleteById(1);
+        assertEquals("Cliente eliminado exitosamente",salida.getMensaje());
+    }
+
+    @Test
+    void searchByNombre() {
+        List<ClienteEntity> data = Arrays.asList(cliente1, cliente2);
+        Mockito.when(clienteRepository.searchByNombre("Al")).thenReturn(data);
+        List<ClienteDtoResponse> salida = clienteService.searchByName("Al");
+        assertEquals(2, salida.size());
+    }
+
+    //TODO: Agregar test para excepciones
 }
