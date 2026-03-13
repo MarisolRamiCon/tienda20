@@ -37,20 +37,14 @@ public class PedidoService implements IPedidoService {
             return pedidoRepository.findAll()
                     .stream()
                     .filter(PedidoEntity::getActivo)
-                    .map(pedido -> {
-                        PedidoDtoResponse pedidoRequest = new PedidoDtoResponse();
-                        pedidoRequest.setFechaPedido(pedido.getFechaPedido());
-                        pedidoRequest.setTotal(pedido.getTotal());
-                        pedidoRequest.setClienteId(pedido.getCliente().getId());
-                        return pedidoRequest;
-                    })
+                    .map(this::convertirADto)
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al consultar pedidos", e);
-            return List.of();
+            throw new PedidoServiceException("Error de base de datos al listar pedidos", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al consultar pedidos", e);
-            return List.of();
+            throw new PedidoServiceException("Error inesperado al listar pedidos", e);
         }
     }
 
@@ -60,13 +54,7 @@ public class PedidoService implements IPedidoService {
         try {
             PedidoDtoResponse response = pedidoRepository.findById(id)
                     .filter(PedidoEntity::getActivo)
-                    .map(pedido -> {
-                        PedidoDtoResponse dto = new PedidoDtoResponse();
-                        dto.setFechaPedido(pedido.getFechaPedido());
-                        dto.setTotal(pedido.getTotal());
-                        dto.setClienteId(pedido.getCliente().getId());
-                        return dto;
-                    })
+                    .map(this::convertirADto)
                     .orElse(null);
 
             if (response == null) {
@@ -77,10 +65,10 @@ public class PedidoService implements IPedidoService {
             return response;
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar pedido con ID {}", id, e);
-            return null;
+            throw new PedidoServiceException("Error de base de datos al buscar pedido por ID", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar pedido con ID {}", id, e);
-            return null;
+            throw new PedidoServiceException("Error inesperado al buscar pedido por ID", e);
         }
     }
 
@@ -105,10 +93,10 @@ public class PedidoService implements IPedidoService {
             return new MensajeDtoResponse("Pedido guardado exitosamente", true);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar guardar el pedido", e);
-            return new MensajeDtoResponse("Error de acceso a la base de datos al guardar pedido", false);
+            throw new PedidoServiceException("Error de acceso a la base de datos al guardar pedido", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al intentar guardar el pedido", e);
-            return new MensajeDtoResponse("Error inesperado al guardar pedido", false);
+            throw new PedidoServiceException("Error inesperado al guardar pedido", e);
         }
     }
 
@@ -139,10 +127,10 @@ public class PedidoService implements IPedidoService {
 
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar actualizar el pedido ID {}", id, e);
-            return new MensajeDtoResponse("Error de acceso a la base de datos al actualizarpedido", false);
+            throw new PedidoServiceException("Error de acceso a la base de datos al actualizar pedido", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al actualizar el pedido ID {}", id, e);
-            return new MensajeDtoResponse("Error inesperado al actualizar pedido con id " + id, false);
+            throw new PedidoServiceException("Error inesperado al actualizar pedido", e);
         }
     }
 
@@ -152,7 +140,7 @@ public class PedidoService implements IPedidoService {
         log.info("Service: Solicitud para eliminar lógicamente el pedido con ID: {}", id);
         try {
             if (pedidoRepository.existsById(id)) {
-                pedidoRepository.eliminarPedido(id);
+                pedidoRepository.eliminarPedido(id); // Asumo que este método hace un UPDATE para cambiar el estado a inactivo
                 log.info("Service: Pedido con ID {} eliminado lógicamente de la BD", id);
                 return new MensajeDtoResponse("Pedido eliminado exitosamente", true);
             }
@@ -160,10 +148,10 @@ public class PedidoService implements IPedidoService {
             return new MensajeDtoResponse("Pedido no encontrado", false);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al eliminar el pedido ID {}", id, e);
-            return new MensajeDtoResponse("Error de acceso a la base de datos al eliminar pedido con id " + id, false);
+            throw new PedidoServiceException("Error de acceso a la base de datos al eliminar pedido", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al eliminar el pedido ID {}", id, e);
-            return new MensajeDtoResponse("Error inesperado al eliminar pedido con id " + id, false);
+            throw new PedidoServiceException("Error inesperado al eliminar pedido", e);
         }
     }
 
@@ -176,20 +164,14 @@ public class PedidoService implements IPedidoService {
             return pedidoRepository.findByFechaPedidoBetween(fechaInicio, fechaFin)
                     .stream()
                     .filter(PedidoEntity::getActivo)
-                    .map(pedido -> {
-                        PedidoDtoResponse dto = new PedidoDtoResponse();
-                        dto.setFechaPedido(pedido.getFechaPedido());
-                        dto.setTotal(pedido.getTotal());
-                        dto.setClienteId(pedido.getCliente().getId());
-                        return dto;
-                    })
+                    .map(this::convertirADto)
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por rango de fechas", e);
-            return List.of();
+            throw new PedidoServiceException("Error de base de datos al buscar por rango de fechas", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por rango de fechas", e);
-            return List.of();
+            throw new PedidoServiceException("Error inesperado al buscar por rango de fechas", e);
         }
     }
 
@@ -200,24 +182,18 @@ public class PedidoService implements IPedidoService {
             return pedidoRepository.findByCliente_Id(clienteId)
                     .stream()
                     .filter(PedidoEntity::getActivo)
-                    .map(pedido -> {
-                        PedidoDtoResponse dto = new PedidoDtoResponse();
-                        dto.setFechaPedido(pedido.getFechaPedido());
-                        dto.setTotal(pedido.getTotal());
-                        dto.setClienteId(pedido.getCliente().getId());
-                        return dto;
-                    })
+                    .map(this::convertirADto)
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por cliente ID: {}", clienteId, e);
-            return List.of();
+            throw new PedidoServiceException("Error de base de datos al buscar por cliente", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por cliente ID: {}", clienteId, e);
-            return List.of();
+            throw new PedidoServiceException("Error inesperado al buscar por cliente", e);
         }
     }
 
-// QUERYS PERSONALIZADOS
+    // QUERYS PERSONALIZADOS
 
     @Override
     public List<PedidoDtoResponse> buscarPorRangoTotal(Double rangoMin, Double rangoMax) {
@@ -225,20 +201,14 @@ public class PedidoService implements IPedidoService {
         try {
             return pedidoRepository.buscarPorRangoTotal(rangoMin, rangoMax)
                     .stream()
-                    .map(pedido -> {
-                        PedidoDtoResponse dto = new PedidoDtoResponse();
-                        dto.setFechaPedido(pedido.getFechaPedido());
-                        dto.setTotal(pedido.getTotal());
-                        dto.setClienteId(pedido.getCliente().getId());
-                        return dto;
-                    })
+                    .map(this::convertirADto)
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por rango de total", e);
-            return List.of();
+            throw new PedidoServiceException("Error de base de datos al buscar por rango de total", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por rango de total", e);
-            return List.of();
+            throw new PedidoServiceException("Error inesperado al buscar por rango de total", e);
         }
     }
 
@@ -248,29 +218,34 @@ public class PedidoService implements IPedidoService {
         try {
             return pedidoRepository.buscarPedidosActivosPorCliente(clienteId)
                     .stream()
-                    .map(pedido -> {
-                        PedidoDtoResponse dto = new PedidoDtoResponse();
-                        dto.setFechaPedido(pedido.getFechaPedido());
-                        dto.setTotal(pedido.getTotal());
-                        dto.setClienteId(pedido.getCliente().getId());
-                        return dto;
-                    })
+                    .map(this::convertirADto)
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar pedidos activos del cliente ID: {}", clienteId, e);
-            return List.of();
+            throw new PedidoServiceException("Error de base de datos al buscar pedidos activos", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar pedidos activos del cliente ID: {}", clienteId, e);
-            return List.of();
+            throw new PedidoServiceException("Error inesperado al buscar pedidos activos", e);
         }
     }
 
-    // Clase interna para manejo de excepciones
+    // =======================================================
+    // METODO PRIVADO DE APOYO (HELPER)
+    // =======================================================
+    private PedidoDtoResponse convertirADto(PedidoEntity pedido) {
+        PedidoDtoResponse dto = new PedidoDtoResponse();
+        dto.setFechaPedido(pedido.getFechaPedido());
+        dto.setTotal(pedido.getTotal());
+        dto.setClienteId(pedido.getCliente().getId());
+        return dto;
+    }
+
+    // =======================================================
+    // EXCEPCIÓN PERSONALIZADA
+    // =======================================================
     public class PedidoServiceException extends RuntimeException {
         public PedidoServiceException(String message, Throwable cause) {
             super(message, cause);
         }
     }
-
-
 }
