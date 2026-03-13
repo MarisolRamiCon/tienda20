@@ -45,26 +45,27 @@ public class EmpleadoService implements IEmpleadoService {
         }
     }
 
+    // CORRECCIÓN: Cambiamos EmpleadoDtoRequest por Integer id para mantener consistencia
     @Override
-    public EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoDtoRequest) {
-        log.info("Service: Buscando empleado por ID: {}", empleadoDtoRequest.getId());
+    public EmpleadoDtoResponse buscarPorId(Integer id) {
+        log.info("Service: Buscando empleado por ID: {}", id);
         try {
-            EmpleadoDtoResponse response = empleadoRepository.findById(empleadoDtoRequest.getId())
+            EmpleadoDtoResponse response = empleadoRepository.findById(id)
                     .filter(EmpleadoEntity::getActivo)
                     .map(this::mapearADto)
                     .orElse(null);
 
             if (response == null) {
-                log.warn("Service: Empleado con ID {} no encontrado o está inactivo", empleadoDtoRequest.getId());
+                log.warn("Service: Empleado con ID {} no encontrado o está inactivo", id);
             } else {
                 log.info("Service: Empleado '{}' encontrado con éxito", response.getNombre());
             }
             return response;
         } catch (DataAccessException e) {
-            log.error("Service: Error de BD al buscar empleado con ID {}", empleadoDtoRequest.getId(), e);
+            log.error("Service: Error de BD al buscar empleado con ID {}", id, e);
             return null;
         } catch (Exception e) {
-            log.error("Service: Error inesperado al buscar empleado con ID {}", empleadoDtoRequest.getId(), e);
+            log.error("Service: Error inesperado al buscar empleado con ID {}", id, e);
             return null;
         }
     }
@@ -218,15 +219,15 @@ public class EmpleadoService implements IEmpleadoService {
         }
     }
 
-
+    // CORRECCIÓN: Cambiamos 'dto' por un nombre explícito 'empleadoResponse'
     private EmpleadoDtoResponse mapearADto(EmpleadoEntity empleado) {
-        EmpleadoDtoResponse dto = new EmpleadoDtoResponse();
-        dto.setId(empleado.getId());
-        dto.setNombre(empleado.getNombre());
-        dto.setApellido(empleado.getApellido());
-        dto.setPuesto(empleado.getPuesto());
-        dto.setSalario(empleado.getSalario());
-        dto.setFechaContratacion(empleado.getFechaContratacion());
-        return dto;
+        EmpleadoDtoResponse empleadoResponse = new EmpleadoDtoResponse();
+        empleadoResponse.setId(empleado.getId());
+        empleadoResponse.setNombre(empleado.getNombre());
+        empleadoResponse.setApellido(empleado.getApellido());
+        empleadoResponse.setPuesto(empleado.getPuesto());
+        empleadoResponse.setSalario(empleado.getSalario());
+        empleadoResponse.setFechaContratacion(empleado.getFechaContratacion());
+        return empleadoResponse;
     }
 }

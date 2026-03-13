@@ -6,6 +6,7 @@ import com.inndata20.tienda.model.ProductoDtoResponse;
 import com.inndata20.tienda.service.IProductoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,39 +24,66 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
-    @GetMapping("/listar")
-    public List<ProductoDtoResponse> listarProductos() {
+    // GET a /api/v1/productos
+    @GetMapping
+    public ResponseEntity<List<ProductoDtoResponse>> listarProductos() {
         log.info("REST Request: Solicitando la lista de todos los productos");
-        return productoService.listarProductos();
+        return ResponseEntity.ok(productoService.listarProductos());
     }
 
-    @GetMapping("/buscar/{id}")
-    public ProductoDtoResponse buscarPorId(@PathVariable Integer id) {
+    // GET a /api/v1/productos/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoDtoResponse> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando producto con ID: {}", id);
-        return productoService.buscarPorId(id);
+        ProductoDtoResponse producto = productoService.buscarPorId(id);
+
+        if (producto == null) {
+            return ResponseEntity.notFound().build(); // Retorna 404 si no existe
+        }
+        return ResponseEntity.ok(producto); // Retorna 200 OK si lo encuentra
     }
 
-    @PostMapping("/guardar")
-    public MensajeDtoResponse guardarProducto(@RequestBody ProductoDtoRequest productoRequest) {
+    // POST a /api/v1/productos
+    @PostMapping
+    public ResponseEntity<MensajeDtoResponse> guardarProducto(@RequestBody ProductoDtoRequest productoRequest) {
         log.info("REST Request: Petición para guardar un nuevo producto: {}", productoRequest.getNombre());
-        return productoService.guardarProducto(productoRequest);
+        MensajeDtoResponse response = productoService.guardarProducto(productoRequest);
+
+        if (response.getExito()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retorna 201 Created
+        }
+        return ResponseEntity.badRequest().body(response); // Retorna 400 Bad Request
     }
 
-    @PutMapping("/actualizar/{id}")
-    public MensajeDtoResponse actualizarProducto(@PathVariable Integer id, @RequestBody ProductoDtoRequest productoRequest) {
+    // PUT a /api/v1/productos/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<MensajeDtoResponse> actualizarProducto(@PathVariable Integer id, @RequestBody ProductoDtoRequest productoRequest) {
         log.info("REST Request: Petición para actualizar el producto con ID: {}", id);
-        return productoService.actualizarProducto(id, productoRequest);
+        MensajeDtoResponse response = productoService.actualizarProducto(id, productoRequest);
+
+        if (response.getExito()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public MensajeDtoResponse eliminarProducto(@PathVariable Integer id) {
+    // DELETE a /api/v1/productos/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MensajeDtoResponse> eliminarProducto(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el producto con ID: {}", id);
-        return productoService.eliminarProducto(id);
+        MensajeDtoResponse response = productoService.eliminarProducto(id);
+
+        if (response.getExito()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
     }
 
-    // METODOS JPA PERSONALIZADOS
+    // ==========================================
+    // METODOS JPA Y QUERYS PERSONALIZADOS
+    // ==========================================
 
-    @GetMapping("/buscar/categoria")
+    @GetMapping("/categoria") // Le quitamos el "buscar"
     public ResponseEntity<List<ProductoDtoResponse>> buscarPorCategoriaYPrecio(
             @RequestParam String categoria,
             @RequestParam Double precio) {
@@ -63,7 +91,7 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.buscarPorCategoriaYPrecio(categoria, precio));
     }
 
-    @GetMapping("/buscar/stock")
+    @GetMapping("/stock") // Le quitamos el "buscar"
     public ResponseEntity<List<ProductoDtoResponse>> buscarPorStockEntre(
             @RequestParam Integer stockMin,
             @RequestParam Integer stockMax) {
@@ -71,9 +99,7 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.buscarPorStockEntre(stockMin, stockMax));
     }
 
-    // QUERYS PERSONALIZADOS
-
-    @GetMapping("/buscar/nombre-categoria")
+    @GetMapping("/busqueda") // Queda más limpio usar un endpoint genérico para filtros
     public ResponseEntity<List<ProductoDtoResponse>> buscarPorNombreYCategoria(
             @RequestParam String nombre,
             @RequestParam String categoria) {
@@ -81,7 +107,7 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.buscarPorNombreYCategoria(nombre, categoria));
     }
 
-    @GetMapping("/buscar/proveedor/{proveedorId}")
+    @GetMapping("/proveedor/{proveedorId}") // Le quitamos el "buscar"
     public ResponseEntity<List<ProductoDtoResponse>> buscarPorProveedor(
             @PathVariable Integer proveedorId) {
         log.info("REST Request: Buscando productos del proveedor con ID: {}", proveedorId);

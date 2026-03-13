@@ -8,17 +8,15 @@ import com.inndata20.tienda.model.ProductoDtoResponse;
 import com.inndata20.tienda.repository.ProductoRepository;
 import com.inndata20.tienda.repository.ProveedoresRepository;
 import com.inndata20.tienda.service.IProductoService;
-import lombok.extern.slf4j.Slf4j; // ✅ Importamos Slf4j
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
-@Slf4j // ✅ Agregamos la anotación para usar log
+@Slf4j
 @Service
 public class ProductoService implements IProductoService {
 
@@ -38,15 +36,15 @@ public class ProductoService implements IProductoService {
         try {
             return productoRepository.findAll()
                     .stream()
-                    .filter(ProductoEntity::getActivo)
+                    .filter(ProductoEntity::getActivo) // Recuerda: Sería ideal pasarlo a findAllByActivoTrue() en el Repository
                     .map(this::mapearADto)
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al consultar productos", e);
-            return List.of();
+            throw new ProductoServiceException("Error de base de datos al listar productos", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al consultar productos", e);
-            return List.of();
+            throw new ProductoServiceException("Error inesperado al listar productos", e);
         }
     }
 
@@ -67,10 +65,10 @@ public class ProductoService implements IProductoService {
             return response;
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar producto con ID {}", id, e);
-            return null;
+            throw new ProductoServiceException("Error de base de datos al buscar producto por ID", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar producto con ID {}", id, e);
-            return null;
+            throw new ProductoServiceException("Error inesperado al buscar producto por ID", e);
         }
     }
 
@@ -100,15 +98,12 @@ public class ProductoService implements IProductoService {
 
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar guardar el producto {}", productoRequest.getNombre(), e);
-            return new MensajeDtoResponse("Error de base de datos al guardar producto", false);
+            throw new ProductoServiceException("Error de base de datos al guardar producto", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al intentar guardar el producto {}", productoRequest.getNombre(), e);
-            return new MensajeDtoResponse("Error inesperado al guardar producto", false);
+            throw new ProductoServiceException("Error inesperado al guardar producto", e);
         }
     }
-
-
-
 
     @Transactional
     @Override
@@ -140,10 +135,10 @@ public class ProductoService implements IProductoService {
 
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al intentar actualizar el producto ID {}", id, e);
-            return new MensajeDtoResponse("Error de base de datos al actualizar producto", false);
+            throw new ProductoServiceException("Error de base de datos al actualizar producto", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al actualizar el producto ID {}", id, e);
-            return new MensajeDtoResponse("Error inesperado al actualizar producto", false);
+            throw new ProductoServiceException("Error inesperado al actualizar producto", e);
         }
     }
 
@@ -161,16 +156,14 @@ public class ProductoService implements IProductoService {
             return new MensajeDtoResponse("Producto no encontrado", false);
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al eliminar el producto ID {}", id, e);
-            return new MensajeDtoResponse("Error de base de datos al eliminar producto", false);
+            throw new ProductoServiceException("Error de base de datos al eliminar producto", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al eliminar el producto ID {}", id, e);
-            return new MensajeDtoResponse("Error inesperado al eliminar producto", false);
+            throw new ProductoServiceException("Error inesperado al eliminar producto", e);
         }
     }
 
-
     // JPA PERSONALIZADOS
-
 
     @Override
     public List<ProductoDtoResponse> buscarPorCategoriaYPrecio(String categoria, Double precio) {
@@ -183,10 +176,10 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por categoría '{}' y precio", categoria, e);
-            return List.of();
+            throw new ProductoServiceException("Error de base de datos al buscar por categoría y precio", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por categoría '{}' y precio", categoria, e);
-            return List.of();
+            throw new ProductoServiceException("Error inesperado al buscar por categoría y precio", e);
         }
     }
 
@@ -201,14 +194,14 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por stock entre {} y {}", stockMin, stockMax, e);
-            return List.of();
+            throw new ProductoServiceException("Error de base de datos al buscar por stock", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por stock entre {} y {}", stockMin, stockMax, e);
-            return List.of();
+            throw new ProductoServiceException("Error inesperado al buscar por stock", e);
         }
     }
 
-// QUERYS PERSONALIZADOS
+    // QUERYS PERSONALIZADOS
 
     @Override
     public List<ProductoDtoResponse> buscarPorNombreYCategoria(String nombre, String categoria) {
@@ -220,10 +213,10 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por nombre '{}' y categoría '{}'", nombre, categoria, e);
-            return List.of();
+            throw new ProductoServiceException("Error de base de datos al buscar por nombre y categoría", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por nombre '{}' y categoría '{}'", nombre, categoria, e);
-            return List.of();
+            throw new ProductoServiceException("Error inesperado al buscar por nombre y categoría", e);
         }
     }
 
@@ -237,34 +230,12 @@ public class ProductoService implements IProductoService {
                     .toList();
         } catch (DataAccessException e) {
             log.error("Service: Error de BD al buscar por proveedor ID: {}", proveedorId, e);
-            return List.of();
+            throw new ProductoServiceException("Error de base de datos al buscar por proveedor", e);
         } catch (Exception e) {
             log.error("Service: Error inesperado al buscar por proveedor ID: {}", proveedorId, e);
-            return List.of();
+            throw new ProductoServiceException("Error inesperado al buscar por proveedor", e);
         }
     }
 
-
-
-
-
-
-    // --- MÉTODO AUXILIAR PARA NO REPETIR CÓDIGO ---
-    private ProductoDtoResponse mapearADto(ProductoEntity producto) {
-        ProductoDtoResponse dto = new ProductoDtoResponse();
-        dto.setNombre(producto.getNombre());
-        dto.setDescripcion(producto.getDescripcion());
-        dto.setPrecio(producto.getPrecio());
-        dto.setCategoria(producto.getCategoria());
-        dto.setProveedor(producto.getProveedor().getId());
-        dto.setStock(producto.getStock());
-        return dto;
-    }
-
-    // Clase interna para manejo de excepciones
-    public class ProductoServiceException extends RuntimeException {
-        public ProductoServiceException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
-}
+    // --- METODO AUXILIAR PARA NO REPETIR CÓDIGO ---
+    private ProductoDtoResponse mapearADto
