@@ -27,7 +27,7 @@ public class PedidoController {
 
     // GET a /api/v1/pedidos
     @GetMapping
-    public ResponseEntity<?> listarPedidos() {
+    public ResponseEntity<Object> listarPedidos() {
         log.info("REST Request: Solicitando la lista de todos los pedidos");
         List<PedidoDtoResponse> pedidos = pedidoService.listarPedidos();
 
@@ -38,9 +38,9 @@ public class PedidoController {
         return ResponseEntity.ok(pedidos);
     }
 
-    // GET a /api/v1/pedidos/{id}
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<Object> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando pedido con ID: {}", id);
         PedidoDtoResponse pedido = pedidoService.buscarPorId(id);
 
@@ -57,31 +57,31 @@ public class PedidoController {
         log.info("REST Request: Petición para guardar un nuevo pedido del cliente ID: {}", pedidoRequest.getClienteId());
         MensajeDtoResponse response = pedidoService.guardarPedido(pedidoRequest);
 
-        if (response.getExito()) {
+        if (Boolean.TRUE.equals(response.getExito())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retorna 201 Created
         }
         return ResponseEntity.badRequest().body(response); // Retorna 400 Bad Request
     }
 
-    // PUT a /api/v1/pedidos/{id}
+
     @PutMapping("/{id}")
     public ResponseEntity<MensajeDtoResponse> actualizarPedido(@PathVariable Integer id, @RequestBody PedidoDtoRequest pedidoRequest) {
         log.info("REST Request: Petición para actualizar el pedido con ID: {}", id);
         MensajeDtoResponse response = pedidoService.actualizarPedido(id, pedidoRequest);
 
-        if (response.getExito()) {
+         if (Boolean.TRUE.equals(response.getExito())) {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body(response);
     }
 
-    // DELETE a /api/v1/pedidos/{id}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<MensajeDtoResponse> eliminarPedido(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el pedido con ID: {}", id);
         MensajeDtoResponse response = pedidoService.eliminarPedido(id);
 
-        if (response.getExito()) {
+        if (Boolean.TRUE.equals(response.getExito())) {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body(response);
@@ -92,7 +92,7 @@ public class PedidoController {
     // ==========================================
 
     @GetMapping("/fechas")
-    public ResponseEntity<?> buscarPorRangoFechas(
+    public ResponseEntity<Object> buscarPorRangoFechas(
             @RequestParam LocalDate fechaInicio,
             @RequestParam LocalDate fechaFin) {
         log.info("REST Request: Buscando pedidos entre {} y {}", fechaInicio, fechaFin);
@@ -106,7 +106,7 @@ public class PedidoController {
     }
 
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<?> buscarPorCliente(@PathVariable Integer clienteId) {
+    public ResponseEntity<Object> buscarPorCliente(@PathVariable Integer clienteId) {
         log.info("REST Request: Buscando pedidos del cliente con ID: {}", clienteId);
         List<PedidoDtoResponse> pedidos = pedidoService.buscarPorCliente(clienteId);
 
@@ -122,7 +122,7 @@ public class PedidoController {
     // ==========================================
 
     @GetMapping("/total")
-    public ResponseEntity<?> buscarPorRangoTotal(
+    public ResponseEntity<Object> buscarPorRangoTotal(
             @RequestParam Double rangoMin,
             @RequestParam Double rangoMax) {
         log.info("REST Request: Buscando pedidos con total entre {} y {}", rangoMin, rangoMax);
@@ -136,7 +136,7 @@ public class PedidoController {
     }
 
     @GetMapping("/cliente/{clienteId}/activos")
-    public ResponseEntity<?> buscarPedidosActivosPorCliente(@PathVariable Integer clienteId) {
+    public ResponseEntity<Object> buscarPedidosActivosPorCliente(@PathVariable Integer clienteId) {
         log.info("REST Request: Buscando pedidos activos del cliente con ID: {}", clienteId);
         List<PedidoDtoResponse> pedidos = pedidoService.buscarPedidosActivosPorCliente(clienteId);
 

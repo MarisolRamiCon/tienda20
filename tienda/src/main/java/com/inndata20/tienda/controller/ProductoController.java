@@ -26,7 +26,7 @@ public class ProductoController {
 
     // GET a /api/v1/productos
     @GetMapping
-    public ResponseEntity<?> listarProductos() {
+    public ResponseEntity<Object> listarProductos() {
         log.info("REST Request: Solicitando la lista de todos los productos");
         List<ProductoDtoResponse> productos = productoService.listarProductos();
 
@@ -37,9 +37,9 @@ public class ProductoController {
         return ResponseEntity.ok(productos);
     }
 
-    // GET a /api/v1/productos/{id}
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<Object> buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando producto con ID: {}", id);
         ProductoDtoResponse producto = productoService.buscarPorId(id);
 
@@ -56,31 +56,31 @@ public class ProductoController {
         log.info("REST Request: Petición para guardar un nuevo producto: {}", productoRequest.getNombre());
         MensajeDtoResponse response = productoService.guardarProducto(productoRequest);
 
-        if (response.getExito()) {
+        if (Boolean.TRUE.equals(response.getExito())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retorna 201 Created
         }
         return ResponseEntity.badRequest().body(response); // Retorna 400 Bad Request
     }
 
-    // PUT a /api/v1/productos/{id}
+
     @PutMapping("/{id}")
     public ResponseEntity<MensajeDtoResponse> actualizarProducto(@PathVariable Integer id, @RequestBody ProductoDtoRequest productoRequest) {
         log.info("REST Request: Petición para actualizar el producto con ID: {}", id);
         MensajeDtoResponse response = productoService.actualizarProducto(id, productoRequest);
 
-        if (response.getExito()) {
+        if (Boolean.TRUE.equals(response.getExito())) {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body(response);
     }
 
-    // DELETE a /api/v1/productos/{id}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<MensajeDtoResponse> eliminarProducto(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el producto con ID: {}", id);
         MensajeDtoResponse response = productoService.eliminarProducto(id);
 
-        if (response.getExito()) {
+        if (Boolean.TRUE.equals(response.getExito())) {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body(response);
@@ -91,7 +91,7 @@ public class ProductoController {
     // ==========================================
 
     @GetMapping("/categoria")
-    public ResponseEntity<?> buscarPorCategoriaYPrecio(
+    public ResponseEntity<Object> buscarPorCategoriaYPrecio(
             @RequestParam String categoria,
             @RequestParam Double precio) {
         log.info("REST Request: Buscando productos de la categoría '{}' con precio menor a {}", categoria, precio);
@@ -105,7 +105,7 @@ public class ProductoController {
     }
 
     @GetMapping("/stock")
-    public ResponseEntity<?> buscarPorStockEntre(
+    public ResponseEntity<Object> buscarPorStockEntre(
             @RequestParam Integer stockMin,
             @RequestParam Integer stockMax) {
         log.info("REST Request: Buscando productos con stock entre {} y {}", stockMin, stockMax);
@@ -119,7 +119,7 @@ public class ProductoController {
     }
 
     @GetMapping("/busqueda")
-    public ResponseEntity<?> buscarPorNombreYCategoria(
+    public ResponseEntity<Object> buscarPorNombreYCategoria(
             @RequestParam String nombre,
             @RequestParam String categoria) {
         log.info("REST Request: Buscando productos con nombre '{}' y categoría '{}'", nombre, categoria);
@@ -133,7 +133,7 @@ public class ProductoController {
     }
 
     @GetMapping("/proveedor/{proveedorId}")
-    public ResponseEntity<?> buscarPorProveedor(
+    public ResponseEntity<Object> buscarPorProveedor(
             @PathVariable Integer proveedorId) {
         log.info("REST Request: Buscando productos del proveedor con ID: {}", proveedorId);
         List<ProductoDtoResponse> productos = productoService.buscarPorProveedor(proveedorId);
