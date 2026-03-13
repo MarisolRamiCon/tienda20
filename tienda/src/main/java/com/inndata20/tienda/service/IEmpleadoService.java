@@ -18,7 +18,7 @@ public interface IEmpleadoService {
 
     MensajeDtoResponse actualizarEmpleado(Integer id, EmpleadoDtoRequest empleadoRequest);
 
-    boolean eliminarEmpleado(Integer id);
+    MensajeDtoResponse eliminarEmpleado(Integer id);
 
     // --- MÉTODOS JPA PERSONALIZADOS ---
     List<EmpleadoDtoResponse> buscarPorPuesto(String puesto);
