@@ -6,7 +6,6 @@ import com.inndata20.tienda.model.MensajeDtoResponse;
 import com.inndata20.tienda.service.IEmpleadoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,15 +34,15 @@ public class EmpleadoController {
     @GetMapping("/buscar/{id}")
     public EmpleadoDtoResponse buscarPorId(@PathVariable Integer id) {
         log.info("REST Request: Buscando empleado con ID: {}", id);
-        EmpleadoDtoRequest request = new EmpleadoDtoRequest();
-        request.setId(id);
-        return empleadoService.buscarPorId(request);
+        EmpleadoDtoRequest empleadoRequest = new EmpleadoDtoRequest();
+        empleadoRequest.setId(id);
+        return empleadoService.buscarPorId(empleadoRequest);
     }
 
     @PostMapping("/guardar")
-    public ResponseEntity<MensajeDtoResponse> guardarEmpleado(@RequestBody EmpleadoDtoRequest empleado) {
-        log.info("REST Request: Petición para guardar un nuevo empleado: {}", empleado.getNombre());
-        MensajeDtoResponse respuesta = empleadoService.guardarEmpleado(empleado);
+    public ResponseEntity<MensajeDtoResponse> guardarEmpleado(@RequestBody EmpleadoDtoRequest empleadoRequest) {
+        log.info("REST Request: Petición para guardar un nuevo empleado: {}", empleadoRequest.getNombre());
+        MensajeDtoResponse respuesta = empleadoService.guardarEmpleado(empleadoRequest);
         return ResponseEntity.ok(respuesta);
     }
 
@@ -57,12 +56,7 @@ public class EmpleadoController {
     @DeleteMapping("/eliminar/{id}")
     public MensajeDtoResponse eliminarEmpleado(@PathVariable Integer id) {
         log.info("REST Request: Petición para eliminar lógicamente el empleado con ID: {}", id);
-        if (empleadoService.eliminarEmpleado(id)) {
-            log.info("Empleado con ID: {} eliminado correctamente", id);
-            return new MensajeDtoResponse("Empleado eliminado correctamente", true);
-        }
-        log.warn("REST Request Fallido: No se pudo eliminar, empleado con ID: {} no encontrado", id);
-        return new MensajeDtoResponse("Empleado no encontrado o ya eliminado", false);
+        return empleadoService.eliminarEmpleado(id);
     }
 
     // JPA PERSONALIZADOS
@@ -86,7 +80,7 @@ public class EmpleadoController {
             @RequestParam BigDecimal salarioMin,
             @RequestParam BigDecimal salarioMax) {
         log.info("REST Request: Buscando empleados con salario entre {} y {}", salarioMin, salarioMax);
-        return empleadoService.buscarPorRangoSalario(salarioMin,salarioMax);
+        return empleadoService.buscarPorRangoSalario(salarioMin, salarioMax);
     }
 
     @GetMapping("/fecha-contratacion")
