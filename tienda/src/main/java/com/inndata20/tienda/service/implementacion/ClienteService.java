@@ -78,10 +78,11 @@ public class ClienteService implements IClienteService {
 
         if (nuevoCliente.getCorreo() != null || nuevoCliente.getTelefono() != null){
             try {
+                log.info("Guardando nuevo cliente en la base de datos");
                 clienteRepository.save(nuevoCliente);
                 return new MensajeStrResponse("Cliente registrado exitosamente");
             } catch (Exception e) {
-                //TODO: Dejar log aqui.
+                log.info(e.getMessage());
                 return new MensajeStrResponse(e.getMessage());
             }
         } else  {
@@ -111,7 +112,7 @@ public class ClienteService implements IClienteService {
 
             try {
                 clienteRepository.save(cliente);
-                return new MensajeStrResponse("Cliente registrado exitosamente");
+                return new MensajeStrResponse("Cliente modificado exitosamente");
             } catch (Exception e) {
                 return new MensajeStrResponse(e.getMessage());
             }
@@ -123,19 +124,28 @@ public class ClienteService implements IClienteService {
     @Override
     public MensajeStrResponse deleteById(int id){
         log.info("Solicitando la eliminación del cliente por id: {id}");
-        Optional<ClienteEntity> solicitud = clienteRepository.findById(id);// TODO: Agregar Try catch
+        Optional<ClienteEntity> solicitud = clienteRepository.findById(id);
         if (solicitud.isPresent()) {
             ClienteEntity cliente = solicitud.get();
             cliente.setActivo(false);
-            clienteRepository.save(cliente);
+            try {
+                log.info("Guardando el cliente con estado inactivo en la base de datos");
+                clienteRepository.save(cliente);
+            } catch (Exception e) {
+                log.info(e.getMessage());
+                return new MensajeStrResponse(e.getMessage());
+            }
             return new MensajeStrResponse("Cliente eliminado exitosamente");
         } else {
-            return new MensajeStrResponse("El cliente no se encontró el registro");
+            return new MensajeStrResponse("El cliente no se encontró en el registro");
         }
     }
 
     public List<ClienteDtoResponse> searchByName(String busqueda){
-        return clienteRepository.searchByNombre(busqueda).stream().map(cliente -> //TODO: Agregar Try catch
+        log.info("Solicitando la búsqueda de clientes por nombre: {busqueda}");
+        try{
+            log.info("Realizando la búsqueda de clientes por nombre: {busqueda}");
+            return clienteRepository.searchByNombre(busqueda).stream().map(cliente ->
                 new ClienteDtoResponse(
                         cliente.getId(),
                         cliente.getNombre(),
@@ -145,5 +155,9 @@ public class ClienteService implements IClienteService {
                         cliente.getTelefono()
                 )
         ).toList();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new EntityNotFoundException(e);
+        }
     }
 }
