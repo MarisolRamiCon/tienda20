@@ -8,11 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
-
 import java.time.LocalDate;
 import java.util.List;
 
+@Repository
 public interface PedidoRepository extends JpaRepository<PedidoEntity,Integer> {
 
     @Query("UPDATE PedidoEntity p SET p.activo = false WHERE p.id = :id")
@@ -37,5 +36,4 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity,Integer> {
     // Buscar pedidos activos de un cliente específico
     @Query("SELECT p FROM PedidoEntity p WHERE p.cliente.id = :clienteId AND p.activo = true")
     List<PedidoEntity> buscarPedidosActivosPorCliente(@Param("clienteId") Integer clienteId);
-
 }
