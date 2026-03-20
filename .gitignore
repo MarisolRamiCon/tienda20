@@ -11,3 +11,6 @@
 # Directorios de build
 /target/
 /out/
+
+#Visual Studio Code
+.vscode
