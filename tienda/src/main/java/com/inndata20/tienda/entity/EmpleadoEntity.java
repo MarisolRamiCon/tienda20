@@ -41,7 +41,7 @@ public class EmpleadoEntity {
     private BigDecimal salario;
 
     @Column(name = "fecha_contratacion")
-    private LocalDate fecha_contratacion;
+    private LocalDate fechaContratacion;
 
     @Column(name = "activo")
     private Boolean activo = true;

@@ -1,62 +1,232 @@
 package com.inndata20.tienda.service.implementacion;
 
 import com.inndata20.tienda.entity.EmpleadoEntity;
+import com.inndata20.tienda.model.EmpleadoDtoRequest;
+import com.inndata20.tienda.model.EmpleadoDtoResponse;
+import com.inndata20.tienda.model.MensajeDtoResponse;
 import com.inndata20.tienda.repository.EmpleadoRepository;
 import com.inndata20.tienda.service.IEmpleadoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 public class EmpleadoService implements IEmpleadoService {
 
+    private final EmpleadoRepository empleadoRepository;
+
     @Autowired
-    EmpleadoRepository empleadoRepository;
-
-    @Override
-    public List<EmpleadoEntity> listarEmpleados() {
-        return empleadoRepository.findAll()
-                .stream()
-                .filter(empleado -> empleado.getActivo()) // ✅ solo activos
-                .toList();
+    public EmpleadoService(EmpleadoRepository empleadoRepository) {
+        this.empleadoRepository = empleadoRepository;
     }
 
     @Override
-    public EmpleadoEntity buscarPorId(Integer id) {
-        return empleadoRepository.findById(id)
-                .filter(empleado -> empleado.getActivo()) // ✅ solo si está activo
-                .orElse(null);
-    }
-
-
-    @Override
-    public EmpleadoEntity guardarEmpleado(EmpleadoEntity empleado){
-        return empleadoRepository.save(empleado);
-    }
-
-
-    @Override
-    public EmpleadoEntity actualizarEmpleado(Integer id, EmpleadoEntity empleado) {
-        EmpleadoEntity empleadoExistente = empleadoRepository.findById(id).orElse(null);
-        if (empleadoExistente != null) {
-            empleadoExistente.setNombre(empleado.getNombre());
-            empleadoExistente.setApellido(empleado.getApellido());
-            empleadoExistente.setPuesto(empleado.getPuesto());
-            empleadoExistente.setSalario(empleado.getSalario());
-            empleadoExistente.setFecha_contratacion(empleado.getFecha_contratacion());
-            return empleadoRepository.save(empleadoExistente);
+    public List<EmpleadoDtoResponse> listarEmpleados() {
+        log.info("Service: Consultando todos los empleados activos en la base de datos");
+        try {
+            return empleadoRepository.findAll()
+                    .stream()
+                    .filter(EmpleadoEntity::getActivo)
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al consultar empleados", e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al consultar empleados", e);
+            return List.of();
         }
-        return null;
     }
 
     @Override
-    public boolean eliminarEmpleado(Integer id) {
-        if (empleadoRepository.existsById(id)) {
-            empleadoRepository.eliminarEmpleado(id);
-            return true;
+    public EmpleadoDtoResponse buscarPorId(EmpleadoDtoRequest empleadoRequest) {
+        log.info("Service: Buscando empleado por ID: {}", empleadoRequest.getId());
+        try {
+            EmpleadoDtoResponse response = empleadoRepository.findById(empleadoRequest.getId())
+                    .filter(EmpleadoEntity::getActivo)
+                    .map(this::mapearADto)
+                    .orElse(null);
+
+            if (response == null) {
+                log.warn("Service: Empleado con ID {} no encontrado o está inactivo", empleadoRequest.getId());
+            } else {
+                log.info("Service: Empleado '{}' encontrado con éxito", response.getNombre());
+            }
+            return response;
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar empleado con ID {}", empleadoRequest.getId(), e);
+            return null;
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar empleado con ID {}", empleadoRequest.getId(), e);
+            return null;
         }
-        return false;
     }
 
+    @Transactional
+    @Override
+    public MensajeDtoResponse guardarEmpleado(EmpleadoDtoRequest empleadoRequest) {
+        log.info("Service: Iniciando proceso para guardar nuevo empleado: {}", empleadoRequest.getNombre());
+        try {
+            EmpleadoEntity empleado = new EmpleadoEntity();
+            empleado.setNombre(empleadoRequest.getNombre());
+            empleado.setApellido(empleadoRequest.getApellido());
+            empleado.setPuesto(empleadoRequest.getPuesto());
+            empleado.setSalario(empleadoRequest.getSalario());
+            empleado.setFechaContratacion(empleadoRequest.getFechaContratacion());
+            empleado.setActivo(true);
+
+            empleadoRepository.save(empleado);
+            log.info("Service: Empleado '{}' guardado exitosamente en la BD", empleadoRequest.getNombre());
+            return new MensajeDtoResponse("Empleado guardado exitosamente", true);
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al intentar guardar el empleado {}", empleadoRequest.getNombre(), e);
+            return new MensajeDtoResponse("Error de base de datos al guardar empleado", false);
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al guardar el empleado {}", empleadoRequest.getNombre(), e);
+            return new MensajeDtoResponse("Error inesperado al guardar empleado", false);
+        }
+    }
+
+    @Transactional
+    @Override
+    public MensajeDtoResponse actualizarEmpleado(Integer id, EmpleadoDtoRequest empleadoRequest) {
+        log.info("Service: Iniciando proceso de actualización para el empleado ID: {}", id);
+        try {
+            EmpleadoEntity empleadoExistente = empleadoRepository.findById(id).orElse(null);
+            if (empleadoExistente == null || !empleadoExistente.getActivo()) {
+                log.warn("Service: No se puede actualizar. Empleado con ID {} no encontrado o inactivo", id);
+                return new MensajeDtoResponse("Empleado no encontrado o inactivo", false);
+            }
+
+            empleadoExistente.setNombre(empleadoRequest.getNombre());
+            empleadoExistente.setApellido(empleadoRequest.getApellido());
+            empleadoExistente.setPuesto(empleadoRequest.getPuesto());
+            empleadoExistente.setSalario(empleadoRequest.getSalario());
+            empleadoExistente.setFechaContratacion(empleadoRequest.getFechaContratacion());
+
+            empleadoRepository.save(empleadoExistente);
+            log.info("Service: Empleado con ID {} actualizado exitosamente", id);
+            return new MensajeDtoResponse("Empleado actualizado exitosamente", true);
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al intentar actualizar el empleado ID {}", id, e);
+            return new MensajeDtoResponse("Error de base de datos al actualizar empleado", false);
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al actualizar el empleado ID {}", id, e);
+            return new MensajeDtoResponse("Error inesperado al actualizar empleado", false);
+        }
+    }
+
+    @Transactional
+    @Override
+    public MensajeDtoResponse eliminarEmpleado(Integer id) {
+        log.info("Service: Solicitud para eliminar lógicamente el empleado con ID: {}", id);
+        try {
+            if (empleadoRepository.existsById(id)) {
+                empleadoRepository.eliminarEmpleado(id);
+                log.info("Service: Empleado con ID {} eliminado lógicamente de la BD", id);
+                return new MensajeDtoResponse("Empleado eliminado exitosamente", true);
+            }
+            log.warn("Service: No se pudo eliminar. Empleado con ID {} no existe", id);
+            return new MensajeDtoResponse("Empleado no encontrado", false);
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al eliminar el empleado ID {}", id, e);
+            return new MensajeDtoResponse("Error de base de datos al eliminar empleado", false);
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al eliminar el empleado ID {}", id, e);
+            return new MensajeDtoResponse("Error inesperado al eliminar empleado", false);
+        }
+    }
+
+    // JPA PERSONALIZADOS
+
+    @Override
+    public List<EmpleadoDtoResponse> buscarPorPuesto(String puesto) {
+        log.info("Service: Consultando BD por puesto '{}'", puesto);
+        try {
+            return empleadoRepository.findByPuesto(puesto)
+                    .stream()
+                    .filter(EmpleadoEntity::getActivo)
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por puesto '{}'", puesto, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por puesto '{}'", puesto, e);
+            return List.of();
+        }
+    }
+
+    @Override
+    public List<EmpleadoDtoResponse> buscarPorNombre(String nombre) {
+        log.info("Service: Consultando BD por nombre que contenga '{}'", nombre);
+        try {
+            return empleadoRepository.findByNombreContainingIgnoreCase(nombre)
+                    .stream()
+                    .filter(EmpleadoEntity::getActivo)
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por nombre '{}'", nombre, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por nombre '{}'", nombre, e);
+            return List.of();
+        }
+    }
+
+    // QUERYS PERSONALIZADOS
+
+    @Override
+    public List<EmpleadoDtoResponse> buscarPorRangoSalario(BigDecimal salarioMin, BigDecimal salarioMax) {
+        log.info("Service: Consultando BD por salario entre {} y {}", salarioMin, salarioMax);
+        try {
+            return empleadoRepository.buscarPorRangoSalario(salarioMin, salarioMax)
+                    .stream()
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por rango de salario", e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por rango de salario", e);
+            return List.of();
+        }
+    }
+
+    @Override
+    public List<EmpleadoDtoResponse> buscarPorFechaContratacion(LocalDate fecha) {
+        log.info("Service: Consultando BD por fecha de contratación a partir de {}", fecha);
+        try {
+            return empleadoRepository.buscarPorFechaContratacion(fecha)
+                    .stream()
+                    .map(this::mapearADto)
+                    .toList();
+        } catch (DataAccessException e) {
+            log.error("Service: Error de BD al buscar por fecha de contratación '{}'", fecha, e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Service: Error inesperado al buscar por fecha de contratación '{}'", fecha, e);
+            return List.of();
+        }
+    }
+
+    // CORRECCIÓN: Cambiamos 'dto' por un nombre explícito 'empleadoResponse'
+    private EmpleadoDtoResponse mapearADto(EmpleadoEntity empleado) {
+        EmpleadoDtoResponse empleadoResponse = new EmpleadoDtoResponse();
+        empleadoResponse.setId(empleado.getId());
+        empleadoResponse.setNombre(empleado.getNombre());
+        empleadoResponse.setApellido(empleado.getApellido());
+        empleadoResponse.setPuesto(empleado.getPuesto());
+        empleadoResponse.setSalario(empleado.getSalario());
+        empleadoResponse.setFechaContratacion(empleado.getFechaContratacion());
+        return empleadoResponse;
+    }
 }
